@@ -15,20 +15,20 @@ namespace AnimalTest.Controllers
 
 
 
-        public static List<Animal> animals = new List<Animal>
-            {
-               new Animal { Id=1, Name="Dog", Sound="VauVau" },
-               new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
-               new Animal { Id=3, Name="Fish", Sound=" " },
-               new Animal { Id=4, Name="Cat", Sound="Meow" },
-               new Animal { Id=5, Name="Cow", Sound="Mooo!" }
-            };
+        public static List<Animal> animals = new List<Animal>();
+        //    {
+        //       new Animal { Id=1, Name="Dog", Sound="VauVau" },
+        //       new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
+        //       new Animal { Id=3, Name="Fish", Sound=" " },
+        //       new Animal { Id=4, Name="Cat", Sound="Meow" },
+        //       new Animal { Id=5, Name="Cow", Sound="Mooo!" }
+        //    };
 
 
 
         public HttpResponseMessage Get()
         {
-            if(animals == null)
+            if(animals.Count() == 0)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound,"Sorry, we can't find any animals for you");
             }
