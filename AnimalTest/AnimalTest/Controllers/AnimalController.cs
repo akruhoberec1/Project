@@ -11,7 +11,7 @@ namespace AnimalTest.Controllers
 
 
 
-        List<Animal> animals = new List<Animal>
+        public static List<Animal> animals = new List<Animal>
             {
                new Animal { Id=1, Name="Dog", Sound="VauVau" },
                new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
