@@ -48,14 +48,16 @@ namespace AnimalTest.Controllers
 
         public HttpResponseMessage Post([FromBody] Animal ani)
         {
-            if(ani.Id < 0 || ani.Id > animals.Count())
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {ani.Id}.");
-            }
+            
             Animal animal = new Animal();
             animal.Id = ani.Id;
             animal.Name = ani.Name;
             animal.Sound = ani.Sound;
+
+            if (animal == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, we cannot post an animal");
+            }
 
             animals.Add(animal);
 
@@ -82,7 +84,6 @@ namespace AnimalTest.Controllers
 
         public HttpResponseMessage Delete(int id)
         {
-            
 
             if(id < 0 || id > animals.Count())
             {
