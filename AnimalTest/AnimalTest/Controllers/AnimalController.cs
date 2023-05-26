@@ -71,12 +71,13 @@ public HttpResponseMessage Get()
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
             }
+
             Animal animalToPut = animals.Find(u => u.Id == id);
 
             if (animalToPut == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, there is no animal to update.");
-            }    
+            }
 
             animalToPut.Id = id;
             animalToPut.Name = animal.Name;
