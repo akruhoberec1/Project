@@ -38,7 +38,7 @@ public HttpResponseMessage Get()
 
         public HttpResponseMessage Get(int id)
         {
-            if(id < 0 || id > animals.Count())
+            if(id < 0 || animals.All(m => m.Id != id))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using Id number {id}.");
             }
@@ -48,7 +48,7 @@ public HttpResponseMessage Get()
 
         public HttpResponseMessage Post([FromBody] Animal ani)
         {
-            
+
             Animal animal = new Animal();
             animal.Id = ani.Id;
             animal.Name = ani.Name;
@@ -61,22 +61,29 @@ public HttpResponseMessage Get()
 
             animals.Add(animal);
 
+
             return Request.CreateResponse<List<Animal>>(HttpStatusCode.OK, animals);
         }
 
 
-        public HttpResponseMessage Put(int id, [FromBody]  Animal ani)
+        public HttpResponseMessage Put(int id, [FromBody]  Animal animal)
         {
-            if (id <= 0 || id > animals.Count())
+            if (id <= 0 || animals.All(m => m.Id != id))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
             }
+
             Animal animalToPut = animals.Find(u => u.Id == id);
 
-            animalToPut.Id = ani.Id;
-            animalToPut.Name = ani.Name;
-            animalToPut.Sound = ani.Sound;
+            if (animalToPut == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, there is no animal to update.");
+            }
 
+            animalToPut.Id = id;
+            animalToPut.Name = animal.Name;
+            animalToPut.Sound = animal.Sound;
+            
             return Request.CreateResponse<Animal>(HttpStatusCode.OK, animalToPut);
 
         }
@@ -85,15 +92,27 @@ public HttpResponseMessage Get()
         public HttpResponseMessage Delete(int id)
         {
 
-            if(id < 0 || id > animals.Count())
+            if(id < 0 || animals.All(m => m.Id != id))
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, we cannot find an animal using id number {id}.");
             }
+
+
             Animal animalToRemove = animals.Find(r => r.Id == id);
-            animals.Remove(animalToRemove);
+            if (animalToRemove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, $"There is no animal you're looking for.");
+            }
 
-            return Request.CreateResponse<List<Animal>>(HttpStatusCode.OK, animals);
 
+            bool result = animals.Remove(animalToRemove);
+            if(result != true)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, $"Sorry, but the animal {animalToRemove.Name} is still alive!");
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, $"{animalToRemove.Name} just went extinct from the database!");
         }
+
     }
 }
