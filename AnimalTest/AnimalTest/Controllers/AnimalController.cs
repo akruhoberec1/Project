@@ -19,16 +19,16 @@ namespace AnimalTest.Controllers
             {
                new Animal { Id=1, Name="Dog", Sound="VauVau" },
                new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
-               new Animal { Id=3, Name="Fish", Sound=" " },
-               new Animal { Id=4, Name="Cat", Sound="Meow" },
-               new Animal { Id=5, Name="Cow", Sound="Mooo!" }
+               new Animal { Id = 3, Name = "Fish", Sound = " " },
+               new Animal { Id = 4, Name = "Cat", Sound = "Meow" },
+               new Animal { Id = 5, Name = "Cow", Sound = "Mooo!" }
             };
 
 
 
-        public HttpResponseMessage Get()
+public HttpResponseMessage Get()
         {
-            if(animals == null)
+            if(animals.Count() == 0)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound,"Sorry, we can't find any animals for you");
             }
@@ -40,7 +40,7 @@ namespace AnimalTest.Controllers
         {
             if(id < 0 || id > animals.Count())
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
+                return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using Id number {id}.");
             }
             Animal animal = animals.Find(m => m.Id == id);
             return Request.CreateResponse<Animal>(HttpStatusCode.OK, animal);
@@ -54,7 +54,7 @@ namespace AnimalTest.Controllers
             animal.Name = ani.Name;
             animal.Sound = ani.Sound;
 
-            if (animal == null)
+            if (animal.Id == 0 || animal.Name == null || animal.Id < 0)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, we cannot post an animal");
             }
@@ -67,7 +67,7 @@ namespace AnimalTest.Controllers
 
         public HttpResponseMessage Put(int id, [FromBody]  Animal ani)
         {
-            if (id < 0 || id > animals.Count() || id != ani.Id)
+            if (id <= 0 || id > animals.Count())
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
             }
