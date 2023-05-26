@@ -48,7 +48,7 @@ namespace AnimalTest.Controllers
 
         public HttpResponseMessage Post([FromBody] Animal ani)
         {
-            
+
             Animal animal = new Animal();
             animal.Id = ani.Id;
             animal.Name = ani.Name;
@@ -61,7 +61,7 @@ namespace AnimalTest.Controllers
 
             animals.Add(animal);
 
-            return Request.CreateResponse<IEnumerable<Animal>>(HttpStatusCode.OK, animals);
+            return Request.CreateResponse<List<Animal>>(HttpStatusCode.OK, animals);
         }
 
 
