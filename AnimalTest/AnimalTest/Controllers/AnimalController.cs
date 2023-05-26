@@ -17,11 +17,11 @@ namespace AnimalTest.Controllers
 
         public static List<Animal> animals = new List<Animal>
             {
-               new Animal { Id=1, Name="Dog", Sound="VauVau" },
-               new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
-               new Animal { Id = 3, Name = "Fish", Sound = " " },
-               new Animal { Id = 4, Name = "Cat", Sound = "Meow" },
-               new Animal { Id = 5, Name = "Cow", Sound = "Mooo!" }
+               //new Animal { Id=1, Name="Dog", Sound="VauVau" },
+               //new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
+               //new Animal { Id = 3, Name = "Fish", Sound = " " },
+               //new Animal { Id = 4, Name = "Cat", Sound = "Meow" },
+               //new Animal { Id = 5, Name = "Cow", Sound = "Mooo!" }
             };
 
 
@@ -81,7 +81,7 @@ public HttpResponseMessage Get()
             animalToPut.Id = id;
             animalToPut.Name = animal.Name;
             animalToPut.Sound = animal.Sound;
-
+            
             return Request.CreateResponse<Animal>(HttpStatusCode.OK, animalToPut);
 
         }
@@ -92,13 +92,24 @@ public HttpResponseMessage Get()
 
             if(id < 0 || id > animals.Count())
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, we cannot find an animal using id number {id}.");
             }
+
+
             Animal animalToRemove = animals.Find(r => r.Id == id);
-            animals.Remove(animalToRemove);
+            if (animalToRemove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, $"There is no animal you're looking for.");
+            }
+
+
+            bool result = animals.Remove(animalToRemove);
+            if(result != true)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent, $"Sorry, but the animal {animalToRemove.Name} is still alive!");
+            }
 
             return Request.CreateResponse(HttpStatusCode.OK, $"{animalToRemove.Name} just went extinct from the database!");
-
         }
     }
 }
