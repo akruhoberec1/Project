@@ -61,6 +61,7 @@ public HttpResponseMessage Get()
 
             animals.Add(animal);
 
+
             return Request.CreateResponse<List<Animal>>(HttpStatusCode.OK, animals);
         }
 
@@ -112,5 +113,6 @@ public HttpResponseMessage Get()
 
             return Request.CreateResponse(HttpStatusCode.OK, $"{animalToRemove.Name} just went extinct from the database!");
         }
+
     }
 }
