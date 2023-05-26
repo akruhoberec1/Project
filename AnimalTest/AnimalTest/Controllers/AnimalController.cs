@@ -65,7 +65,7 @@ public HttpResponseMessage Get()
         }
 
 
-        public HttpResponseMessage Put(int id, [FromBody]  Animal ani)
+        public HttpResponseMessage Put(int id, [FromBody]  Animal animal)
         {
             if (id <= 0 || id > animals.Count())
             {
@@ -73,9 +73,14 @@ public HttpResponseMessage Get()
             }
             Animal animalToPut = animals.Find(u => u.Id == id);
 
-            animalToPut.Id = ani.Id;
-            animalToPut.Name = ani.Name;
-            animalToPut.Sound = ani.Sound;
+            if (animalToPut == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, there is no animal to update.");
+            }    
+
+            animalToPut.Id = id;
+            animalToPut.Name = animal.Name;
+            animalToPut.Sound = animal.Sound;
 
             return Request.CreateResponse<Animal>(HttpStatusCode.OK, animalToPut);
 
@@ -92,7 +97,7 @@ public HttpResponseMessage Get()
             Animal animalToRemove = animals.Find(r => r.Id == id);
             animals.Remove(animalToRemove);
 
-            return Request.CreateResponse<List<Animal>>(HttpStatusCode.OK, animals);
+            return Request.CreateResponse(HttpStatusCode.OK, $"{animalToRemove.Name} just went extinct from the database!");
 
         }
     }
