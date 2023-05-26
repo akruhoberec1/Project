@@ -17,11 +17,11 @@ namespace AnimalTest.Controllers
 
         public static List<Animal> animals = new List<Animal>
             {
-               //new Animal { Id=1, Name="Dog", Sound="VauVau" },
-               //new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
-               //new Animal { Id = 3, Name = "Fish", Sound = " " },
-               //new Animal { Id = 4, Name = "Cat", Sound = "Meow" },
-               //new Animal { Id = 5, Name = "Cow", Sound = "Mooo!" }
+               new Animal { Id=1, Name="Dog", Sound="VauVau" },
+               new Animal { Id=2, Name="Turtle", Sound="Hellooo" },
+               new Animal { Id = 3, Name = "Fish", Sound = " " },
+               new Animal { Id = 4, Name = "Cat", Sound = "Meow" },
+               new Animal { Id = 5, Name = "Cow", Sound = "Mooo!" }
             };
 
 
@@ -38,7 +38,7 @@ public HttpResponseMessage Get()
 
         public HttpResponseMessage Get(int id)
         {
-            if(id < 0 || id > animals.Count())
+            if(id < 0 || animals.All(m => m.Id != id))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using Id number {id}.");
             }
@@ -67,7 +67,7 @@ public HttpResponseMessage Get()
 
         public HttpResponseMessage Put(int id, [FromBody]  Animal animal)
         {
-            if (id <= 0 || id > animals.Count())
+            if (id <= 0 || animals.All(m => m.Id != id))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, $"Sorry, we cannot find an animal using id number {id}.");
             }
@@ -91,7 +91,7 @@ public HttpResponseMessage Get()
         public HttpResponseMessage Delete(int id)
         {
 
-            if(id < 0 || id > animals.Count())
+            if(id < 0 || animals.All(m => m.Id != id))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, $"Sorry, we cannot find an animal using id number {id}.");
             }
