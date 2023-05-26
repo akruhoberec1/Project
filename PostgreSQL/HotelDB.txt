@@ -1,0 +1,70 @@
+
+
+create table Person(
+Id serial primary key,
+FirstName varchar (50) not null,
+LastName varchar (50) not null,
+OIB smallint not null check (OIB = 11) 
+);
+
+create table Employee(
+Id serial primary key,
+Certified bool,
+SuperiorEmployeeId int not null,
+constraint FK_Person_Employee_Id foreign key(Id) references Person(Id),
+constraint fk_Employee_Employee_Id foreign key(SuperiorEmployeeId) references Employee(Id)
+);
+
+create table Guest(
+Id serial primary key,
+constraint FK_Person_Guest_Id foreign key(Id) references Person(Id)
+);
+
+create table RoomType(
+Id serial primary key,
+RoomType varchar not null,
+RoomPrice numeric(15,6) not null
+);
+
+create table Room(
+Id serial primary key,
+RoomNumber int not null check (RoomNumber <= 4),
+RoomTypeId int not null,
+constraint FK_RoomType_Room_Id foreign key(TypeId) references RoomType(Id)
+);
+
+create table GuestRoom(
+GuestId serial primary key,
+RoomId int not null,
+constraint FK_Room_GuestRoom_RoomId foreign key(GuestId) references Guest(Id),
+constraint FK_Guest_GuestRoom_GuestId foreign key(RoomId) references Room(Id)
+);
+
+create table PaymentDetails(
+Id serial primary key,
+PaymentMethod varchar(50) not null,
+CardNo integer
+);
+
+
+create table Reservation(
+Id serial primary key,
+RoomId int not null,
+GuestId int not null,
+PaymentDetailsId int not null,
+ArrivalDate date not null default current_date,
+DepartureDate date not null,
+constraint FK_PaymentDetails_Reservation_PaymentDetailsId foreign key(PaymentDetailsId) references PaymentDetails(Id),
+constraint FK_Room_Reservation_RoomId foreign key(RoomId) references Room(Id),
+constraint FK_Guest_Reservation_GuestId foreign key(GuestId) references Guest(Id)
+);
+
+
+
+INSERT JAVLJA ERROR DA ANDRIJA NIJE COLUMN NAME
+insert into Person (FirstName, LastName, OIB) values 
+("Andrija", "Kruhoberec",12387654325),
+("Branimir", "Križanec", 45863217845),
+("Filip","Todorović",12365897561); 
+
+
