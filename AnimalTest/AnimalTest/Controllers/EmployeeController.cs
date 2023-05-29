@@ -36,7 +36,6 @@ namespace AnimalTest.Controllers
 
                     NpgsqlCommand cmd = new NpgsqlCommand($"INSERT INTO Person (Id, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)", connection);
 
-
                     cmd.Parameters.AddWithValue("Id", uuid);
                     cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
                     cmd.Parameters.AddWithValue("LastName", employee.LastName);
@@ -46,6 +45,7 @@ namespace AnimalTest.Controllers
 
 
                     NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified", connection);
+
                     cmdEmployee.Parameters.AddWithValue("Id", uuid);
                     cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
                     cmdEmployee.Parameters.AddWithValue("Certified", employee.Certified);
@@ -58,7 +58,7 @@ namespace AnimalTest.Controllers
                         return Request.CreateResponse(HttpStatusCode.OK, employee);
                     }
 
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry, the request is bad.");
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Sorry, insert didn't take.");
 
                 }
                 catch (Exception ex)
@@ -68,5 +68,10 @@ namespace AnimalTest.Controllers
 
             }
         }
+
+
+
+        //PUT koristiti string builder
+
     }
 }

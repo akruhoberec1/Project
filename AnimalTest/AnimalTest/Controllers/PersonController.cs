@@ -17,26 +17,43 @@ namespace AnimalTest.Controllers
 
     public class PersonController : ApiController
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
 
 
         //get method
-        //[Route("")]
-        //public HttpResponseMessage Get()
-        //{
+        [Route("")]
+        public HttpResponseMessage Get()
+        {
+            List<Person> people = new List<Person>();
+            NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
+            connection.Open();
 
-        //    NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
-        //    connection.Open();
 
-        //    try
-        //    {
+            try
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand($"SELECT * FROM Person ORDER BY LastName, FirstName", connection);
 
-        //    }
-        //    catch 
-        //    { 
+                var reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        Person person = new Person()
+                        {
+                            Id = [Guid]Read(""),
+                            Title = title,
+                            Tags = new List<Tag>()
+                        };
 
-        //    }
-        //}
+                        Books.Add(book);
+                    }
+                }
+                return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found.");
+            }
+            catch(Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, ex);
+            }
+        }
 
 
 
