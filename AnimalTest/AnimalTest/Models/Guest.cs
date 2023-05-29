@@ -7,5 +7,9 @@ namespace AnimalTest.Models
 {
     public class Guest
     {
+        public Guid Id { get; set; }
+        public string Email { get; set; }   
+        public int Phone { get; set; }  
+
     }
 }

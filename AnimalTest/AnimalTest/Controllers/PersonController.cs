@@ -27,11 +27,11 @@ namespace AnimalTest.Controllers
         //POst method
         [HttpPost]
         [Route("")]
-        public HttpResponseMessage Post(Person person)
+        public HttpResponseMessage Post(Person person, Employee employee, Guest guest)
         {
             var connection = new NpgsqlConnection(connectionString);
             connection.Open();
-            Guid Uuid = Guid.NewGuid(); 
+            Guid uuid = Guid.NewGuid(); 
             using (connection)
             {
                 try
@@ -47,7 +47,7 @@ namespace AnimalTest.Controllers
 
          
                     
-                    cmd.Parameters.AddWithValue("Uuid", person.Id);
+                    cmd.Parameters.AddWithValue("Uuid", uuid);
                     cmd.Parameters.AddWithValue("FirstName", person.FirstName);
                     cmd.Parameters.AddWithValue("LastName", person.LastName);
                     cmd.Parameters.AddWithValue("OIB", person.OIB);
@@ -56,6 +56,9 @@ namespace AnimalTest.Controllers
                     if (person.IsEmployee)
                     {
                         NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO \"Employee\" (Uuid, Salary, Certified) VALUES(@Id,@Salary,@Certified");
+                        cmdEmployee.Parameters.AddWithValue("Uuid", uuid);
+                        cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
+                        cmdEmployee.Parameters.AddWithValue("Uuid", employee.Certified);
                     }
 
 
