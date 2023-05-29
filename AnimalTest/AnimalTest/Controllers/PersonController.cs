@@ -17,63 +17,46 @@ namespace AnimalTest.Controllers
 
     public class PersonController : ApiController
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
 
 
+        //get method
+        //[Route("")]
+        //public HttpResponseMessage Get()
+        //{
+        //    List<Person> people = new List<Person>();
+        //    NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
+        //    connection.Open();
+
+
+        //    try
+        //    {
+        //        NpgsqlCommand cmd = new NpgsqlCommand($"SELECT * FROM Person ORDER BY LastName, FirstName", connection);
+
+        //        var reader = cmd.ExecuteReader();
+        //        if (reader.HasRows)
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                Person person = new Person()
+        //                {
+   
+        //            }
+        //        }
+        //        return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found.");
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.NotFound, ex);
+        //    }
+        //}
 
 
 
 
         //POst method
-        [HttpPost]
-        [Route("")]
-        public HttpResponseMessage Post(Person person)
-        {
-            var connection = new NpgsqlConnection(connectionString);
-            connection.Open();
-            Guid Uuid = Guid.NewGuid(); 
-            using (connection)
-            {
-                try
-                {
-                    if (person == null)
-                    {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry, your request was pretty bad! Insert valid fields!");
-                    }
-
-                    Guid Id = Guid.NewGuid();
-
-                    NpgsqlCommand cmd = new NpgsqlCommand ($"INSERT INTO \"Person\" (Uuid, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)");
-
-         
-                    
-                    cmd.Parameters.AddWithValue("Uuid", person.Id);
-                    cmd.Parameters.AddWithValue("FirstName", person.FirstName);
-                    cmd.Parameters.AddWithValue("LastName", person.LastName);
-                    cmd.Parameters.AddWithValue("OIB", person.OIB);
-                    cmd.Parameters.AddWithValue("IsEmployee", person.IsEmployee);
-
-                    if (person.IsEmployee)
-                    {
-                        NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO \"Employee\" (Uuid, Salary, Certified) VALUES(@Id,@Salary,@Certified");
-                    }
-
-
-                    int NoOfAffetctedRows = cmd.ExecuteNonQuery();
 
 
 
-                    
-                }
-                catch (Exception ex)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
-                }
-                connection.Close();
-
-            }
-            
-        }
 
     }
 }

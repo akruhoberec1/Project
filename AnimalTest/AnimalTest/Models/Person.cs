@@ -10,9 +10,9 @@ namespace AnimalTest.Models
         public Guid Id { get; set; }    
         public string FirstName { get; set; }
         public string LastName { get; set; }    
-        public int OIB { get; set; }
-        public bool IsEmployee { get; set; }    
-        public bool IsGuest { get; set; }   
+        public string OIB { get; set; }
+        public Guest Guest { get; set; }
+        public Employee Employee { get; set; }  
 
     }
 }
