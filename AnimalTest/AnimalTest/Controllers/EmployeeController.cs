@@ -22,7 +22,7 @@ namespace AnimalTest.Controllers
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
             connection.Open();
 
-            Guid uuid = Guid.NewGuid();
+          
             using (connection)
             {
                 try
@@ -32,21 +32,22 @@ namespace AnimalTest.Controllers
                         return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry, your request was pretty bad! Insert valid fields!");
                     }
 
-                    Guid Id = Guid.NewGuid();
+                    Guid id = Guid.NewGuid();
 
                     NpgsqlCommand cmd = new NpgsqlCommand($"INSERT INTO Person (Id, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)", connection);
 
-                    cmd.Parameters.AddWithValue("Id", uuid);
+                    cmd.Parameters.AddWithValue("Id", id);
                     cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
                     cmd.Parameters.AddWithValue("LastName", employee.LastName);
                     cmd.Parameters.AddWithValue("OIB", employee.OIB);
 
                     int affectedRowsPerson = cmd.ExecuteNonQuery();
 
+                   
 
-                    NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified", connection);
+                    NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified)", connection);
 
-                    cmdEmployee.Parameters.AddWithValue("Id", uuid);
+                    cmdEmployee.Parameters.AddWithValue("Id", id);
                     cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
                     cmdEmployee.Parameters.AddWithValue("Certified", employee.Certified);
 
