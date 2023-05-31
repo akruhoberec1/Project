@@ -214,6 +214,8 @@
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Guest.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\Room.cs" />
+    <Compile Include="Models\RoomType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
