@@ -74,16 +74,17 @@ namespace AnimalTest.Controllers
 
        [HttpGet]
        [Route("{id}")]
-       public HttpResponseMessage GetById(int id)
+       public HttpResponseMessage GetById(Guid id)
        {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
-            connection.Open();
-            int personId = id;
+
+
             using (connection)
             {
                 try
                 {
-                    NpgsqlCommand cmd = new NpgsqlCommand($"SELECT * FROM Person WHERE Id = @Id", connection);
+                    NpgsqlCommand cmd = new NpgsqlCommand($"SELECT * FROM Person WHERE Id = @Id", connection); //STRING BUILDER
+                    connection.Open();
                     NpgsqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
