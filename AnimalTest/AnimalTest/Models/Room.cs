@@ -12,5 +12,6 @@ namespace AnimalTest.Models
         public int RoomNumber { get; set; }
         public string RoomTypeId { get; set; }  
         public RoomType RoomType { get; set; }
+        public List<Reservation> Reservations { get; set; } 
     }
 }

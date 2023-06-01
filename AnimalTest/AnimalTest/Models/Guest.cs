@@ -11,7 +11,7 @@ namespace AnimalTest.Models
         public string Email { get; set; }   
         public int Phone { get; set; }  
         public Person Person { get; set; }
-        
+        public List<Reservation> Reservations { get; set; }
 
     }
 }
