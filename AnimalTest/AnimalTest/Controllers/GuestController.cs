@@ -13,7 +13,7 @@ using System.Web.Http;
 namespace AnimalTest.Controllers
 {
     [RoutePrefix("api/guest")]
-    public class GuestController : PersonController
+    public class GuestController : ApiController
     {
 
         [HttpGet]
