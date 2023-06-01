@@ -238,12 +238,13 @@ namespace AnimalTest.Controllers
                     connection.Open();
                     NpgsqlTransaction transaction = connection.BeginTransaction();
                     NpgsqlCommand cmd = new NpgsqlCommand("DELETE FROM Employee WHERE Id=@id", connection);
+                    cmd.Transaction = transaction;  
 
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
 
                     NpgsqlCommand cmdPerson = new NpgsqlCommand("DELETE FROM Person WHERE Id=@id", connection);
-
+                    cmdPerson.Transaction = transaction;
                     cmdPerson.Parameters.AddWithValue("@id", id);
                     cmdPerson.ExecuteNonQuery();
 

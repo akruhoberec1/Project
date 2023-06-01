@@ -4,18 +4,25 @@ create table Person(
 Id uuid primary key,
 FirstName varchar (50) not null,
 LastName varchar (50) not null,
-OIB numeric not null
+OIB varchar (11) not null
 );
 
-alter table Person alter column OIB type varchar (11);
+--alter table Person alter column OIB type varchar (11);
+
+create table Job(
+Id uuid primary key,
+Title varchar (30) not null
+);
 
 create table Employee(
 Id uuid primary key,
 Salary numeric (15,6) not null,
 Certified bool,
 SuperiorEmployeeId uuid,
+JobId uuid,
 constraint FK_Person_Employee_Id foreign key(Id) references Person(Id) on delete cascade,
-constraint fk_Employee_Employee_Id foreign key(SuperiorEmployeeId) references Employee(Id) on delete cascade
+constraint FK_Employee_Employee_Id foreign key(SuperiorEmployeeId) references Employee(Id),
+constraint FK_Job_Employee_JobId foreign key(JobId) references Job(Id)
 );
 
 create table Guest(
@@ -27,22 +34,15 @@ constraint FK_Person_Guest_Id foreign key(Id) references Person(Id) on delete ca
 
 create table RoomType(
 Id uuid primary key,
-RoomType varchar not null,
-RoomPrice numeric(15,6) not null
+Name varchar not null,
+Price numeric(15,6) not null
 );
 
 create table Room(
 Id uuid primary key,
-RoomNumber int not null check (RoomNumber <= 4),
+RoomNumber int not null check (RoomNumber <= 2200),
 RoomTypeId uuid not null,
-constraint FK_RoomType_Room_Id foreign key(RoomTypeId) references RoomType(Id)
-);
-
-create table GuestRoom(
-GuestId uuid primary key,
-RoomId uuid not null,
-constraint FK_Room_GuestRoom_RoomId foreign key(GuestId) references Guest(Id),
-constraint FK_Guest_GuestRoom_GuestId foreign key(RoomId) references Room(Id)
+constraint FK_RoomType_Room_Id foreign key(RoomTypeId) references RoomType(Id) on delete cascade
 );
 
 create table PaymentDetails(
@@ -59,6 +59,7 @@ GuestId uuid not null,
 PaymentDetailsId uuid not null,
 ArrivalDate date not null default current_date,
 DepartureDate date not null,
+HasDinner bool,
 constraint FK_PaymentDetails_Reservation_PaymentDetailsId foreign key(PaymentDetailsId) references PaymentDetails(Id),
 constraint FK_Room_Reservation_RoomId foreign key(RoomId) references Room(Id),
 constraint FK_Guest_Reservation_GuestId foreign key(GuestId) references Guest(Id)
@@ -66,18 +67,22 @@ constraint FK_Guest_Reservation_GuestId foreign key(GuestId) references Guest(Id
 
 
 insert into Person (Id, FirstName, LastName, OIB) values 
-('05227288-c656-4ff3-8a68-143b08df8464','Andrija', 'Kruhoberec',12387654325);
-/*('Branimir', 'Križanec', 45863217845),
-('Filip','Todorović',12365897561),
-('Bruno','Denisov',65874589674),
-('Tihomir','Rečić',68954215945),
-('Patricija','Pernar',45872154689),
-('Monika','Tankosić',14587965874),
-('Lovre','Mažuran',78945521213),
-('Germa','Tiesto',12354986521),
-('Paško','Patak',15862345873),
-('Patak','Tvrdica',12365874951);*/
+('05227288-c656-4ff3-8a68-143b08df8464','Andrija', 'Kruhoberec',12387654325),
+('a55c7326-a3a0-4cb4-ad56-c1e3f5576ece','Branimir', 'Križanec', 45863217845),
+('175edba3-f2ca-4d8e-924c-af795d0e26c1','Filip','Todorović',12365897561),
+('cbfab8e6-a071-43f6-87a7-817eb8c87395','Bruno','Denisov',65874589674),
+('ac573d41-6955-430a-9ac6-e749c07f3071','Tihomir','Rečić',68954215945),
+('0d3e88d0-018b-44f5-8359-c5c246d2d5b2','Ines','Sarmagedon',45872154689),
+('8a5950c8-39e6-4ca7-9ff1-c96de597574e','Monika','Tankosić',14587965874),
+('9f5b678c-f859-49f7-8dae-886ebe4a49a2','Lovre','Mažuran',78945521213),
+('33730d5f-9b9a-42cd-ba26-ecdc037d5b6e','Germa','Tiesto',12354986521),
+('34f15f32-2c74-473d-b6aa-4888f56b4309','Paško','Patak',15862345873),
+('75dbc13b-b988-4a1d-a097-3c26b139ab9c','Patak','Tvrdica',12365874951);
 
 
 select * from person;
 select * from employee e;
+
+drop table roomtype ;
+drop table room;
+
