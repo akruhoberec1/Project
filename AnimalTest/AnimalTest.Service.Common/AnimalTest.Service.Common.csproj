@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>673a9b8f-0770-433e-aad7-4ad4e6180117</ProjectGuid>
+    <ProjectGuid>{673A9B8F-0770-433E-AAD7-4AD4E6180117}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AnimalTest.Service.Common</RootNamespace>
@@ -31,24 +31,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="IEmployeeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AnimalTest.Model.Common\AnimalTest.Model.Common.csproj">
+      <Project>{254c9b59-4571-4ac6-b520-5048eb66dcf8}</Project>
+      <Name>AnimalTest.Model.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Model\AnimalTest.Model.csproj">
+      <Project>{0FD26527-E2CB-4E79-8C72-1890AD3F7D52}</Project>
+      <Name>AnimalTest.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Repository\AnimalTest.Repository.csproj">
+      <Project>{B55186BB-7AC3-43F1-8796-35C2076B5C23}</Project>
+      <Name>AnimalTest.Repository</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>

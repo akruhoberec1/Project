@@ -210,12 +210,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Animal.cs" />
-    <Compile Include="Models\Employee.cs" />
-    <Compile Include="Models\Guest.cs" />
-    <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\Room.cs" />
-    <Compile Include="Models\RoomType.cs" />
+    <Compile Include="Models\EmployeeRest.cs" />
+    <Compile Include="Models\UpdateEmployeeRest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +354,40 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AnimalTest.Common\AnimalTest.Common.csproj">
+      <Project>{f61f0448-e6d8-42b8-abf7-850be9eb46dd}</Project>
+      <Name>AnimalTest.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.DAL\AnimalTest.DAL.csproj">
+      <Project>{91293598-114e-4907-bc55-f1abcf3fe625}</Project>
+      <Name>AnimalTest.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Model.Common\AnimalTest.Model.Common.csproj">
+      <Project>{254c9b59-4571-4ac6-b520-5048eb66dcf8}</Project>
+      <Name>AnimalTest.Model.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Model\AnimalTest.Model.csproj">
+      <Project>{0fd26527-e2cb-4e79-8c72-1890ad3f7d52}</Project>
+      <Name>AnimalTest.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Repository.Common\AnimalTest.Repository.Common.csproj">
+      <Project>{620b7bb1-23f2-4ebf-9b48-32479b6f1fc5}</Project>
+      <Name>AnimalTest.Repository.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Repository\AnimalTest.Repository.csproj">
+      <Project>{b55186bb-7ac3-43f1-8796-35c2076b5c23}</Project>
+      <Name>AnimalTest.Repository</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Service.Common\AnimalTest.Service.Common.csproj">
+      <Project>{673a9b8f-0770-433e-aad7-4ad4e6180117}</Project>
+      <Name>AnimalTest.Service.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimalTest.Service\AnimalTest.Service.csproj">
+      <Project>{d251586e-b602-490e-b988-4f65ea1e298f}</Project>
+      <Name>AnimalTest.Service</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
