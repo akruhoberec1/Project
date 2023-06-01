@@ -25,14 +25,14 @@ namespace AnimalTest.Controllers
             List<Employee> employees = new List<Employee>();
 
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
-            connection.Open();
+            
 
             using (connection)
             {
                 try
                 {
-                   
-                NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id", connection);
+                    connection.Open();
+                    NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id", connection);
                     NpgsqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
@@ -55,7 +55,7 @@ namespace AnimalTest.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, ex);
+                    return Request.CreateResponse(HttpStatusCode.NotFound, ex.Message);
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace AnimalTest.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
                 }
             }
         }
@@ -213,7 +213,8 @@ namespace AnimalTest.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+                
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message);
             }
 
         }
@@ -256,7 +257,8 @@ namespace AnimalTest.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+                
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -285,11 +287,15 @@ namespace AnimalTest.Controllers
                     employee.OIB = (string)reader["OIB"];
                     employee.Salary = (decimal)reader["Salary"];
                     employee.Certified = (bool)reader["Certified"];
+
                     return employee;
                 }
-                return null;
+
+                return null;     
             }
         }
+
+
 
 
 
