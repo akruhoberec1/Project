@@ -1,4 +1,6 @@
 ﻿using AnimalTest.Models;
+using AnimalTest.Repository;
+using AnimalTest.Service;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -60,18 +62,19 @@ namespace AnimalTest.Controllers
             }
         }
 
+        //GET BY ID WORKS REPO PATTERN
         [HttpGet]
         [Route("{id}")]
         public HttpResponseMessage Get(Guid id)
         {
-            Employee employee = GetEmployeeById(id);
+            EmployeeRest employeeToShow = GetEmployeeById(id);
 
-            if(employee == null)
+            if (employeeToShow == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, "Employee cannot be found"); 
+                return Request.CreateResponse(HttpStatusCode.NotFound, "Did not find an employee.");
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, employee);
+            return Request.CreateResponse(HttpStatusCode.OK, employeeToShow);
 
         }
 
@@ -142,9 +145,9 @@ namespace AnimalTest.Controllers
         {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
-            Employee getEmployee = GetEmployeeById(id);
+            EmployeeRest currentEmployee = GetEmployeeById(id);
 
-            if (getEmployee == null)
+            if (currentEmployee == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "This user does not exist");
             }
@@ -228,7 +231,7 @@ namespace AnimalTest.Controllers
 
             try
             {
-                Employee employee = GetEmployeeById(id);
+                EmployeeRest employee = GetEmployeeById(id);
 
                 if (employee == null)
                 {
@@ -265,35 +268,45 @@ namespace AnimalTest.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        private Employee GetEmployeeById(Guid id)
+        private EmployeeRest GetEmployeeById(Guid id)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
+            EmployeeRest employee = MapEmployeeToRest(id);
 
-            using (connection)
-            {
-                NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id WHERE a.Id=@Id", connection);
-                connection.Open();
-                cmd.Parameters.AddWithValue("@Id", id);
+            return employee;
 
-
-                NpgsqlDataReader reader = cmd.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    reader.Read();
-                    Employee employee = new Employee();
-                    employee.Id = id;
-                    employee.FirstName = (string)reader["FirstName"];
-                    employee.LastName = (string)reader["LastName"];
-                    employee.OIB = (string)reader["OIB"];
-                    employee.Salary = (decimal)reader["Salary"];
-                    employee.Certified = (bool)reader["Certified"];
-
-                    return employee;
-                }
-
-                return null;     
-            }
         }
+
+        private EmployeeRest MapEmployeeToRest(Guid id)
+        {
+            EmployeeService employeeService = new EmployeeService();
+            Employee employee = employeeService.GetEmployeeById(id);
+
+            EmployeeRest employeeRest = new EmployeeRest()
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                OIB = employee.OIB,
+                Salary = employee.Salary,
+                Certified = employee.Certified
+            };
+
+            return employeeRest;
+        }
+
+        private Employee MapEmployeeFromRest(EmployeeRest employeeRest)
+        {
+            Employee employee = new Employee()
+            {
+                FirstName = employeeRest.FirstName,
+                LastName = employeeRest.LastName,
+                OIB = employeeRest.OIB, 
+                Salary = employeeRest.Salary,
+                Certified = employeeRest.Certified  
+            };
+
+            return employee;
+        }
+
 
 
 
