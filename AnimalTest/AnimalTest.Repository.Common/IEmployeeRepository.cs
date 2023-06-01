@@ -10,11 +10,10 @@ namespace AnimalTest.Repository.Common
     public interface IEmployeeRepository
     {
         Employee GetEmployeeById(Guid id);
-      /*  IEnumerable<Employee> GetEmployees();
-        bool InsertEmployee(Employee employee);
-        bool DeleteEmployee(int studentID);
-        bool UpdateEmployee(Employee employee);
-        bool SaveChanges(); */
+        bool CreateEmployee(Employee employee);
+        bool UpdateEmployee(Guid id, Employee employee);
+        List<Employee> GetAllEmployees();
+        bool DeleteEmployee(Guid id);
 
     }
 }

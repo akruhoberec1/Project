@@ -11,5 +11,9 @@ namespace AnimalTest.Service.Common
     public interface IEmployeeService 
     {
         Employee GetEmployeeById(Guid id);    
+        bool CreateEmployee(Employee employee);
+        bool UpdateEmployee(Guid id, Employee employee);
+        List<Employee> GetAllEmployees();
+        bool DeleteEmployee(Guid id);   
     }
 }
