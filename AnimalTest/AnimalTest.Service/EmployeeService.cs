@@ -11,45 +11,45 @@ namespace AnimalTest.Service
 {
     public class EmployeeService : IEmployeeService
     {
-        public Employee GetEmployeeById(Guid id)
+        public async Task<Employee> GetEmployeeByIdAsync(Guid id)
         {
             EmployeeRepository repository = new EmployeeRepository();   
-            Employee employee = repository.GetEmployeeById(id); 
+            Employee employee = await  repository.GetEmployeeByIdAsync(id); 
 
             return employee;
       
         }
 
-        public bool CreateEmployee(Employee employee)
+        public async Task<bool> CreateEmployeeAsync(Employee employee)
         {
             EmployeeRepository repository = new EmployeeRepository();   
             
-            bool isCreated = repository.CreateEmployee(employee);  
+            bool isCreated = await repository.CreateEmployeeAsync(employee);  
 
             return isCreated;
         }
 
-        public bool UpdateEmployee(Guid id, Employee employee) 
+        public async Task<bool> UpdateEmployeeAsync(Guid id, Employee employee) 
         {
             EmployeeRepository repository = new EmployeeRepository();
-            bool isUpdated = repository.UpdateEmployee(id, employee);  
+            bool isUpdated = await repository.UpdateEmployeeAsync(id, employee);  
 
             return isUpdated;
             
         }
 
-        public List<Employee> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployeesAsync()
         {
             EmployeeRepository repository = new EmployeeRepository();
-            List<Employee> employees = repository.GetAllEmployees();   
+            List<Employee> employees = await repository.GetAllEmployeesAsync();   
             
             return employees;
         }
 
-        public bool DeleteEmployee(Guid id) 
+        public async Task<bool> DeleteEmployeeAsync(Guid id) 
         {
             EmployeeRepository repository = new EmployeeRepository();
-            bool isDeleted = repository.DeleteEmployee(id); 
+            bool isDeleted = await repository.DeleteEmployeeAsync(id); 
             return isDeleted;
         }
 

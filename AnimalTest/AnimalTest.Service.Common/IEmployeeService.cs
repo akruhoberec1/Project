@@ -10,10 +10,10 @@ namespace AnimalTest.Service.Common
 {
     public interface IEmployeeService 
     {
-        Employee GetEmployeeById(Guid id);    
-        bool CreateEmployee(Employee employee);
-        bool UpdateEmployee(Guid id, Employee employee);
-        List<Employee> GetAllEmployees();
-        bool DeleteEmployee(Guid id);   
+        Task<Employee> GetEmployeeByIdAsync(Guid id);    
+        Task<bool> CreateEmployeeAsync(Employee employee);
+        Task<bool> UpdateEmployeeAsync(Guid id, Employee employee);
+        Task<List<Employee>> GetAllEmployeesAsync();
+        Task<bool> DeleteEmployeeAsync(Guid id);
     }
 }

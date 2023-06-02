@@ -16,7 +16,7 @@ namespace AnimalTest.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        public async Task<Employee> GetEmployeeById(Guid id)
+        public async Task<Employee> GetEmployeeByIdAsync(Guid id)
         {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
@@ -27,7 +27,7 @@ namespace AnimalTest.Repository
                 cmd.Parameters.AddWithValue("@Id", id);
 
 
-                NpgsqlDataReader reader = cmd.ExecuteReader();
+                NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     reader.Read();
@@ -50,7 +50,7 @@ namespace AnimalTest.Repository
         /*
          * INSERT METHOD
          * */
-        public bool CreateEmployee(Employee employee) { 
+        public async Task<bool> CreateEmployeeAsync(Employee employee) { 
 
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
@@ -70,8 +70,8 @@ namespace AnimalTest.Repository
                     cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
                     cmd.Parameters.AddWithValue("LastName", employee.LastName);
                     cmd.Parameters.AddWithValue("OIB", employee.OIB);
-
-                    int affectedRowsPerson = cmd.ExecuteNonQuery();
+                       
+                    int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
 
 
 
@@ -81,7 +81,7 @@ namespace AnimalTest.Repository
                     cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
                     cmdEmployee.Parameters.AddWithValue("Certified", employee.Certified);
 
-                    int affectedRowsEmployee = cmdEmployee.ExecuteNonQuery();
+                    int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
 
                     transaction.Commit();
                     
@@ -108,7 +108,7 @@ namespace AnimalTest.Repository
          * UPDATE METHOD HERE
          * */
 
-        public bool UpdateEmployee(Guid id, Employee employee)
+        public async Task<bool> UpdateEmployeeAsync(Guid id, Employee employee)
         {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
@@ -132,7 +132,7 @@ namespace AnimalTest.Repository
                     queryBuilderPerson.Append(" LastName = @lastName,");
                     cmd.Parameters.AddWithValue("@lastName", employee.LastName);
                 }
-                if(employee.OIB != null)
+                if(employee.OIB != null && employee.OIB != "" && employee.OIB.Length == 11)
                 {
                     queryBuilderPerson.Append(" OIB = @OIB,");
                     cmd.Parameters.AddWithValue("@OIB", employee.OIB);
@@ -146,9 +146,9 @@ namespace AnimalTest.Repository
                 finalPersonQuery.Append(" WHERE Id = @id");
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.CommandText = finalPersonQuery.ToString();
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
 
-                int affectedRowsPerson = cmd.ExecuteNonQuery();
+                int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
 
 
                 //employee values
@@ -170,9 +170,9 @@ namespace AnimalTest.Repository
                 finalEmployeeQuery.Append(" WHERE Id = @id");
                 cmdEmployee.Parameters.AddWithValue("@id", id);
                 cmdEmployee.CommandText = finalEmployeeQuery.ToString();
-                cmdEmployee.ExecuteNonQuery();
+                await cmdEmployee.ExecuteNonQueryAsync();
 
-                int affectedRowsEmployee = cmdEmployee.ExecuteNonQuery();
+                int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
 
                 transaction.Commit();
 
@@ -188,7 +188,7 @@ namespace AnimalTest.Repository
         /*
          * GET ALL METHOD HERE
          * */
-        public List<Employee> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployeesAsync()
         {
             List<Employee> employees = new List<Employee>();
 
@@ -200,7 +200,7 @@ namespace AnimalTest.Repository
 
                 connection.Open();
                 NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id", connection);
-                NpgsqlDataReader reader = cmd.ExecuteReader();
+                NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     while (reader.Read())
@@ -227,7 +227,7 @@ namespace AnimalTest.Repository
          * DELETE METHOD
          * */
 
-        public bool DeleteEmployee(Guid id)
+        public async Task<bool> DeleteEmployeeAsync(Guid id)
         {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
@@ -244,7 +244,7 @@ namespace AnimalTest.Repository
                 NpgsqlCommand cmdPerson = new NpgsqlCommand("DELETE FROM Person WHERE Id=@id", connection);
                 cmdPerson.Transaction = transaction;
                 cmdPerson.Parameters.AddWithValue("@id", id);
-                cmdPerson.ExecuteNonQuery();
+                await cmdPerson.ExecuteNonQueryAsync();
 
                 transaction.Commit();
 

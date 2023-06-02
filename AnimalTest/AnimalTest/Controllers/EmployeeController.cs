@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.WebPages;
@@ -22,10 +23,10 @@ namespace AnimalTest.Controllers
         
         [HttpGet]
         [Route("")]
-        public HttpResponseMessage Get()
+        public async Task<HttpResponseMessage> Get()
         {
             EmployeeService service = new EmployeeService();
-            List<Employee> employees = service.GetAllEmployees();
+            List<Employee> employees = await service.GetAllEmployeesAsync();
             if (employees == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
@@ -40,9 +41,12 @@ namespace AnimalTest.Controllers
         //GET BY ID WORKS REPO PATTERN
         [HttpGet]
         [Route("{id}")]
-        public HttpResponseMessage Get(Guid id)
+        public async Task<HttpResponseMessage> Get(Guid id)
         {
-            EmployeeRest employeeToShow = GetEmployeeById(id);
+            EmployeeService service = new EmployeeService();    
+            Employee employee = await service.GetEmployeeByIdAsync(id);
+
+            EmployeeRest employeeToShow = MapEmployeeToRest(employee);
 
             if (employeeToShow == null)
             {
@@ -56,11 +60,11 @@ namespace AnimalTest.Controllers
 
         [HttpPost]
         [Route("")]
-        public HttpResponseMessage Post([FromBody]EmployeeRest employeeRest)
+        public async Task<HttpResponseMessage> Post([FromBody]EmployeeRest employeeRest)
         {
             Employee employee = MapEmployeeFromRest(employeeRest);
             EmployeeService employeeService = new EmployeeService();
-            bool isCreated = employeeService.CreateEmployee(employee);
+            bool isCreated = await employeeService.CreateEmployeeAsync(employee);
 
             if (isCreated == false)
             {
@@ -75,7 +79,7 @@ namespace AnimalTest.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public HttpResponseMessage Put(Guid id, [FromBody] EmployeeRest employeeRest)
+        public async Task<HttpResponseMessage> Put(Guid id, [FromBody] EmployeeRest employeeRest)
         {
             if(employeeRest == null)
             {
@@ -84,7 +88,7 @@ namespace AnimalTest.Controllers
 
             Employee employee = MapEmployeeFromRest(employeeRest);
             EmployeeService employeeService = new EmployeeService();
-            bool isUpdated = employeeService.UpdateEmployee(id, employee);
+            bool isUpdated = await employeeService.UpdateEmployeeAsync(id, employee);
 
             if(isUpdated == false)
             {
@@ -96,10 +100,10 @@ namespace AnimalTest.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public HttpResponseMessage Delete(Guid id)
+        public async Task<HttpResponseMessage> Delete(Guid id)
         {
             EmployeeService service = new EmployeeService();
-            bool isDeleted = service.DeleteEmployee(id);    
+            bool isDeleted = await service.DeleteEmployeeAsync(id);    
 
             if( isDeleted == false)
             {
@@ -111,10 +115,10 @@ namespace AnimalTest.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        private EmployeeRest GetEmployeeById(Guid id)
+        private async Task<EmployeeRest> GetEmployeeByIdAsyncd(Guid id)
         {
             EmployeeService employeeService = new EmployeeService();
-            Employee employee = employeeService.GetEmployeeById(id);
+            Employee employee = await employeeService.GetEmployeeByIdAsync(id);
             EmployeeRest mappedEmployee = MapEmployeeToRest(employee); // List<EmployeeRest> mappedEmployee = MapEmployeeListToRest(new[] {employee});
 
             return mappedEmployee;
