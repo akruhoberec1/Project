@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Net;
 using System.Linq.Expressions;
 using System.Collections.Specialized;
+using AnimalTest.Common;
 
 namespace AnimalTest.Repository
 {

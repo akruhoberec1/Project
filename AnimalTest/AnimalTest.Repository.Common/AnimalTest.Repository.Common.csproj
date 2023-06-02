@@ -45,6 +45,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AnimalTest.Common\AnimalTest.Common.csproj">
+      <Project>{f61f0448-e6d8-42b8-abf7-850be9eb46dd}</Project>
+      <Name>AnimalTest.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AnimalTest.Model.Common\AnimalTest.Model.Common.csproj">
       <Project>{254c9b59-4571-4ac6-b520-5048eb66dcf8}</Project>
       <Name>AnimalTest.Model.Common</Name>
