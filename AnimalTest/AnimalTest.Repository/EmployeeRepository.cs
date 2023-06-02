@@ -54,66 +54,59 @@ namespace AnimalTest.Repository
 
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
-            using (connection)
+            bool checkedEmployee = EmployeeValidation(employee);
+            if(checkedEmployee == true)
             {
-                try
+                using (connection)
                 {
-
-                    Guid id = Guid.NewGuid();
-                    connection.Open();
-                    NpgsqlTransaction transaction = connection.BeginTransaction();
-
-
-                    NpgsqlCommand cmd = new NpgsqlCommand($"INSERT INTO Person (Id, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)", connection);
-
-                    cmd.Parameters.AddWithValue("Id", id);
-                    if(employee.FirstName != null && employee.FirstName != "") 
+                    try
                     {
+
+                        Guid id = Guid.NewGuid();
+                        connection.Open();
+                        NpgsqlTransaction transaction = connection.BeginTransaction();
+
+
+                        NpgsqlCommand cmd = new NpgsqlCommand($"INSERT INTO Person (Id, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)", connection);
+
+                        cmd.Parameters.AddWithValue("Id", id);
                         cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
-                    }
-                    if(employee.LastName != null && employee.LastName != "")
-                    {
                         cmd.Parameters.AddWithValue("LastName", employee.LastName);
+                        cmd.Parameters.AddWithValue("OIB", employee.OIB);
+
+                        int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
+
+
+                        NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified)", connection);
+
+                        cmdEmployee.Parameters.AddWithValue("Id", id);
+                        cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
+                        cmdEmployee.Parameters.AddWithValue("Certified", employee.Certified);
+
+                        int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
+
+                        transaction.Commit();
+
+
+
+                        if (affectedRowsPerson > 0 && affectedRowsEmployee > 0)
+                        {
+                            return true;
+                        }
+
+                        transaction.Rollback();
+                        return false;
+
                     }
-                    if(employee.OIB != null)
+                    catch (Exception)
                     {
-                        bool checkedOIB = OibChecker(employee.OIB);
-                            if (checkedOIB == true)
-                            {
-                                cmd.Parameters.AddWithValue("OIB", employee.OIB);
-                            }
+                        return false;
                     }
-                    
-                    int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
-
-
-                    NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified)", connection);
-
-                    cmdEmployee.Parameters.AddWithValue("Id", id);
-                    cmdEmployee.Parameters.AddWithValue("Salary", employee.Salary);
-                    cmdEmployee.Parameters.AddWithValue("Certified", employee.Certified);
-
-                    int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
-
-                    transaction.Commit();
-                    
-
-
-                    if (affectedRowsPerson > 0 && affectedRowsEmployee > 0)
-                    {
-                        return true;
-                    }
-
-                    transaction.Rollback();
-                    return false;
 
                 }
-                catch (Exception)
-                {
-                    return false;
-                }
-
             }
+            return false;
+            
         }
 
         /*
@@ -122,80 +115,77 @@ namespace AnimalTest.Repository
 
         public async Task<bool> UpdateEmployeeAsync(Guid id, Employee employee)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
+            NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());   
 
-            using (connection)
+            bool checkedEmployee = EmployeeValidation(employee);
+            if(checkedEmployee == true)
             {
-                StringBuilder queryBuilderPerson = new StringBuilder();
-                NpgsqlCommand cmd = new NpgsqlCommand("", connection);
-                queryBuilderPerson.Append("UPDATE Person SET ");
-                connection.Open();
-                char commaToRemove = ',';
-
-                NpgsqlTransaction transaction = connection.BeginTransaction();
-                //person values
-                if(employee.FirstName != null || employee.FirstName == "")
+                using (connection)
                 {
+                    StringBuilder queryBuilderPerson = new StringBuilder();
+                    NpgsqlCommand cmd = new NpgsqlCommand("", connection);
+                    queryBuilderPerson.Append("UPDATE Person SET ");
+                    connection.Open();
+                    char commaToRemove = ',';
+
+                    NpgsqlTransaction transaction = connection.BeginTransaction();
+
                     queryBuilderPerson.Append("FirstName = @firstName,");
                     cmd.Parameters.AddWithValue("@firstName", employee.FirstName);
-                }
-                if(employee.LastName != null || employee.LastName == "")
-                {
+
                     queryBuilderPerson.Append(" LastName = @lastName,");
                     cmd.Parameters.AddWithValue("@lastName", employee.LastName);
-                }
-                //checking OIB using private static method 
-                bool checkedOIB = OibChecker(employee.OIB);
-                if(checkedOIB == true)
-                {
+
+
                     queryBuilderPerson.Append(" OIB = @OIB,");
                     cmd.Parameters.AddWithValue("@OIB", employee.OIB);
+
+
+                    string queryPerson = queryBuilderPerson.ToString().TrimEnd(commaToRemove);
+                    StringBuilder finalPersonQuery = new StringBuilder();
+                    finalPersonQuery.Append(queryPerson);
+
+                    finalPersonQuery.Append(" WHERE Id = @id");
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.CommandText = finalPersonQuery.ToString();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
+
+
+                    //employee values
+
+                    StringBuilder queryBuilderEmployee = new StringBuilder();
+                    NpgsqlCommand cmdEmployee = new NpgsqlCommand("", connection);
+                    queryBuilderEmployee.Append("UPDATE Employee SET ");
+
+                    queryBuilderEmployee.Append("Salary = @salary,");
+                    cmdEmployee.Parameters.AddWithValue("@salary", employee.Salary);
+                    queryBuilderEmployee.Append("Certified = @certified,");
+                    cmdEmployee.Parameters.AddWithValue("@certified", employee.Certified);
+
+
+                    string queryEmployee = queryBuilderEmployee.ToString().TrimEnd(commaToRemove);
+                    StringBuilder finalEmployeeQuery = new StringBuilder();
+                    finalEmployeeQuery.Append(queryEmployee);
+
+                    finalEmployeeQuery.Append(" WHERE Id = @id");
+                    cmdEmployee.Parameters.AddWithValue("@id", id);
+                    cmdEmployee.CommandText = finalEmployeeQuery.ToString();
+                    await cmdEmployee.ExecuteNonQueryAsync();
+
+                    int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
+
+                    transaction.Commit();
+
+                    if (affectedRowsPerson > 0 && affectedRowsEmployee > 0)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
-                
-
-                string queryPerson = queryBuilderPerson.ToString().TrimEnd(commaToRemove);
-                StringBuilder finalPersonQuery = new StringBuilder();
-                finalPersonQuery.Append(queryPerson);
-
-                finalPersonQuery.Append(" WHERE Id = @id");
-                cmd.Parameters.AddWithValue("@id", id);
-                cmd.CommandText = finalPersonQuery.ToString();
-                await cmd.ExecuteNonQueryAsync();
-
-                int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
-
-
-                //employee values
-
-                StringBuilder queryBuilderEmployee = new StringBuilder();
-                NpgsqlCommand cmdEmployee = new NpgsqlCommand("", connection);
-                queryBuilderEmployee.Append("UPDATE Employee SET ");
-
-                queryBuilderEmployee.Append("Salary = @salary,");
-                cmdEmployee.Parameters.AddWithValue("@salary", employee.Salary);
-                queryBuilderEmployee.Append("Certified = @certified,");
-                cmdEmployee.Parameters.AddWithValue("@certified", employee.Certified);
-
-
-                string queryEmployee = queryBuilderEmployee.ToString().TrimEnd(commaToRemove);
-                StringBuilder finalEmployeeQuery = new StringBuilder();
-                finalEmployeeQuery.Append(queryEmployee);
-
-                finalEmployeeQuery.Append(" WHERE Id = @id");
-                cmdEmployee.Parameters.AddWithValue("@id", id);
-                cmdEmployee.CommandText = finalEmployeeQuery.ToString();
-                await cmdEmployee.ExecuteNonQueryAsync();
-
-                int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
-
-                transaction.Commit();
-
-                if(affectedRowsPerson > 0 && affectedRowsEmployee > 0)
-                {
-                    return true;
-                }  
-                return false;   
             }
+            return false;
         }
             
             
@@ -300,6 +290,17 @@ namespace AnimalTest.Repository
             return controlNumber == lastNumber;
         }
 
+        private static bool EmployeeValidation(Employee employee)
+        {
+            bool checkedOIB = OibChecker(employee.OIB);
+
+            if (employee.FirstName == null || employee.FirstName == ""  || employee.LastName == null || employee.LastName == ""
+               || employee.Salary <= 553 || checkedOIB == false)
+            {
+                return false;
+            }
+            return true;
+        }
 
 
 
