@@ -67,16 +67,24 @@ namespace AnimalTest.Repository
                     NpgsqlCommand cmd = new NpgsqlCommand($"INSERT INTO Person (Id, FirstName, LastName, OIB) VALUES (@Id, @FirstName, @LastName, @OIB)", connection);
 
                     cmd.Parameters.AddWithValue("Id", id);
-                    cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
-                    cmd.Parameters.AddWithValue("LastName", employee.LastName);
-                    bool checkedOIB = OibChecker(employee.OIB);
-                    if (checkedOIB == true)
+                    if(employee.FirstName != null && employee.FirstName != "") 
                     {
-                        cmd.Parameters.AddWithValue("OIB", employee.OIB);
+                        cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
+                    }
+                    if(employee.LastName != null && employee.LastName != "")
+                    {
+                        cmd.Parameters.AddWithValue("LastName", employee.LastName);
+                    }
+                    if(employee.OIB != null)
+                    {
+                        bool checkedOIB = OibChecker(employee.OIB);
+                            if (checkedOIB == true)
+                            {
+                                cmd.Parameters.AddWithValue("OIB", employee.OIB);
+                            }
                     }
                     
                     int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
-
 
 
                     NpgsqlCommand cmdEmployee = new NpgsqlCommand($"INSERT INTO Employee (Id, Salary, Certified) VALUES(@Id,@Salary,@Certified)", connection);
