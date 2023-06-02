@@ -32,7 +32,7 @@ namespace AnimalTest.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
             }
 
-            //List<EmployeeRest> mappedEmployees = MapEmployeeListToRest(employees);
+            //List<EmployeeRest> mappedEmployees = MapEmployeeToRest(employees);
 
             return Request.CreateResponse(HttpStatusCode.OK, employees);
 
@@ -43,9 +43,12 @@ namespace AnimalTest.Controllers
         [Route("{id}")]
         public async Task<HttpResponseMessage> Get(Guid id)
         {
-            EmployeeService service = new EmployeeService();    
-            Employee employee = await service.GetEmployeeByIdAsync(id);
+            if (id == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Please insert valid ID.");
+            }
 
+            Employee employee = await GetEmployeeByIdAsync(id);
             EmployeeRest employeeToShow = MapEmployeeToRest(employee);
 
             if (employeeToShow == null)
@@ -115,13 +118,14 @@ namespace AnimalTest.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        private async Task<EmployeeRest> GetEmployeeByIdAsyncd(Guid id)
+        private async Task<Employee> GetEmployeeByIdAsync(Guid id)
         {
+
             EmployeeService employeeService = new EmployeeService();
             Employee employee = await employeeService.GetEmployeeByIdAsync(id);
-            EmployeeRest mappedEmployee = MapEmployeeToRest(employee); // List<EmployeeRest> mappedEmployee = MapEmployeeListToRest(new[] {employee});
+            //EmployeeRest mappedEmployee = MapEmployeeToRest(employee); // List<EmployeeRest> mappedEmployee = MapEmployeeToRest(new[] {employee});
 
-            return mappedEmployee;
+            return employee;
 
         }
 

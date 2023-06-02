@@ -69,8 +69,12 @@ namespace AnimalTest.Repository
                     cmd.Parameters.AddWithValue("Id", id);
                     cmd.Parameters.AddWithValue("FirstName", employee.FirstName);
                     cmd.Parameters.AddWithValue("LastName", employee.LastName);
-                    cmd.Parameters.AddWithValue("OIB", employee.OIB);
-                       
+                    bool checkedOIB = OibChecker(employee.OIB);
+                    if (checkedOIB == true)
+                    {
+                        cmd.Parameters.AddWithValue("OIB", employee.OIB);
+                    }
+                    
                     int affectedRowsPerson = await cmd.ExecuteNonQueryAsync();
 
 
@@ -132,7 +136,9 @@ namespace AnimalTest.Repository
                     queryBuilderPerson.Append(" LastName = @lastName,");
                     cmd.Parameters.AddWithValue("@lastName", employee.LastName);
                 }
-                if(employee.OIB != null && employee.OIB != "" && employee.OIB.Length == 11)
+                //checking OIB using private static method 
+                bool checkedOIB = OibChecker(employee.OIB);
+                if(checkedOIB == true)
                 {
                     queryBuilderPerson.Append(" OIB = @OIB,");
                     cmd.Parameters.AddWithValue("@OIB", employee.OIB);
@@ -252,8 +258,45 @@ namespace AnimalTest.Repository
                 return true;
             }
         }
-        
 
-     
+
+
+
+ 
+        private static bool OibChecker(string oib)
+        {
+            if (oib.Length != 11)
+            {
+                return false; 
+            }
+
+            int sum = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                int number = int.Parse(oib[i].ToString());
+                sum += number;
+                sum %= 10;
+                if (sum == 0)
+                {
+                    sum = 10;
+                }
+                sum *= 2;
+                sum %= 11;
+            }
+
+            int controlNumber = 11 - sum;
+            controlNumber %= 10;
+
+            int lastNumber = int.Parse(oib[10].ToString());
+
+            return controlNumber == lastNumber;
+        }
+
+
+
+
+
     }
+
 }
+
