@@ -11,6 +11,8 @@ using System.Configuration;
 using System.Net;
 using System.Linq.Expressions;
 using System.Collections.Specialized;
+using AnimalTest.Common;
+using PagedList;
 
 namespace AnimalTest.Repository
 {
@@ -192,7 +194,7 @@ namespace AnimalTest.Repository
         /*
          * GET ALL METHOD HERE
          * */
-        public async Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
+        public async Task<PagedList<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
         {
             List<Employee> employees = new List<Employee>();
 
@@ -201,15 +203,61 @@ namespace AnimalTest.Repository
 
             using (connection)
             {
-
+                
                 connection.Open();
+
+                StringBuilder sqlQuery = new StringBuilder();
+
                 NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id", connection);
+                sqlQuery.Append(cmd);
+
+                if (!string.IsNullOrEmpty(filtering.SearchQuery))
+                {
+                    sqlQuery.Append(" WHERE a.FirstName ILIKE %@SearchQuery% OR a.LastName ILIKE %@SearchQuery%");
+                }           
+
+                if (!string.IsNullOrEmpty(sorting.SortBy))
+                {
+                    sqlQuery.Append(" ORDER BY @SortBy @OrderBy");
+                }
+
+                NpgsqlCommand cmdCount = new NpgsqlCommand("SELECT COUNT(*) FROM (", connection);
+                StringBuilder countQuery = new StringBuilder();
+                countQuery.Append(cmdCount);
+                countQuery.Append(@sqlQuery);
+                countQuery.Append(") as TotalCount");
+
+
+                if (!string.IsNullOrEmpty(filtering.SearchQuery))
+                {
+                    cmd.Parameters.AddWithValue("@SearchQuery", filtering.SearchQuery);
+                }
+                if (!string.IsNullOrEmpty(sorting.SortBy))
+                {
+                    cmd.Parameters.AddWithValue("@SortBy", sorting.SortBy);
+                }
+                if (!string.IsNullOrEmpty(sorting.OrderBy))
+                {
+                    cmd.Parameters.AddWithValue("OrderBy", sorting.OrderBy);
+                }
+                //dobijemo ukupan zbroj
+                //int totalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
+
+
+                //dodamo vrijednosti za perPage i PageNum
+                sqlQuery.Append(" OFFSET @Offset LIMIT @Limit");
+
+
+                NpgsqlCommand cmdFinal = new NpgsqlCommand(sqlQuery.ToString(), connection);    
+                cmdFinal.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
+                cmdFinal.Parameters.AddWithValue("@Limit", paging.PageSize);
+
+
                 NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     while (reader.Read())
                     {
-                        //popunimo listu objektima
                         employees.Add(new Employee()
                         {
                             FirstName = reader["FirstName"].ToString(),
@@ -220,7 +268,10 @@ namespace AnimalTest.Repository
 
                         });
                     }
-                    return employees;
+
+                    //ne mogu poslati totalCount
+                    PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.PageNumber ?? 1, paging.PageSize);
+                    return pagedEmployees;
                 }            
             return null;    
             }

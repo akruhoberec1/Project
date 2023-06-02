@@ -1,6 +1,8 @@
-﻿using AnimalTest.Models;
+﻿using AnimalTest.Common;
+using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service.Common;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +40,10 @@ namespace AnimalTest.Service
             
         }
 
-        public async Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
+        public async Task<PagedList<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
         {
             EmployeeRepository repository = new EmployeeRepository();
-            List<Employee> employees = await repository.GetAllEmployeesFilteredAsync(paging, sorting, filtering);   
+            PagedList<Employee> employees = await repository.GetAllEmployeesFilteredAsync(paging, sorting, filtering);   
             
             return employees;
         }

@@ -3,6 +3,7 @@ using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service;
 using Npgsql;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -25,13 +26,30 @@ namespace AnimalTest.Controllers
         
         [HttpGet]
         [Route("")]
-        public async Task<HttpResponseMessage> Get(Paging paging, Sorting sorting, Filtering filtering)
+        public async Task<HttpResponseMessage> Get(int pageSize, string sortBy, string sortOrder, string searchQuery, int? pageNumber, decimal? minSalary, decimal? maxSalary)
         {
             EmployeeService service = new EmployeeService();
 
+            Paging paging = new Paging()
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
 
+            Sorting sorting = new Sorting()
+            {
+                SortBy = sortBy,
+                OrderBy = sortOrder
+            };
 
-            List<Employee> employees = await service.GetAllEmployeesFilteredAsync(paging, sorting, filtering);
+            Filtering filtering = new Filtering()
+            {
+               SearchQuery = searchQuery,
+               MinSalary = minSalary,
+               MaxSalary = maxSalary
+            };
+
+            PagedList<Employee> employees = await service.GetAllEmployeesFilteredAsync(paging, sorting, filtering);
             if (employees == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
@@ -131,27 +149,28 @@ namespace AnimalTest.Controllers
 
         }
 
-        private List<EmployeeRest> MapEmployeeToRest(List<Employee> employees)
+        private PagedList<EmployeeRest> MapEmployeeToRest(PagedList<Employee> employees)
         {
-
-
-            List<EmployeeRest> employeesRest = new List<EmployeeRest>();
 
             if(employees != null)
             {
-                foreach (Employee employee in employees)
-                {
-                    EmployeeRest employeeRest = new EmployeeRest();
-                    employeeRest.FirstName = employee.FirstName;
-                    employeeRest.LastName = employee.LastName;
-                    employeeRest.OIB = employee.OIB;
-                    employeeRest.Salary = employee.Salary;
-                    employeeRest.Certified = employee.Certified;
-                    employeesRest.Add(employeeRest);
-                };
+                PagedList<EmployeeRest> employeesRest = new PagedList<EmployeeRest>(
+                    employees.Select(employee => new EmployeeRest
+                    {
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        OIB = employee.OIB,
+                        Salary = employee.Salary,
+                        Certified = employee.Certified
+                    }).ToList(),
+                    employees.PageNumber,
+                    employees.PageSize
+                );
+
+                return employeesRest;
             }
 
-            return employeesRest;
+            return null;
         }
 
         private Employee MapEmployeeFromRest(EmployeeRest employeeRest)

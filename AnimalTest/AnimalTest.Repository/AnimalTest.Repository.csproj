@@ -45,6 +45,9 @@
     <Reference Include="Npgsql, Version=7.0.4.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.7.0.4\lib\netstandard2.0\Npgsql.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -94,6 +97,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AnimalTest.Common\AnimalTest.Common.csproj">
+      <Project>{F61F0448-E6D8-42B8-ABF7-850BE9EB46DD}</Project>
+      <Name>AnimalTest.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AnimalTest.Model.Common\AnimalTest.Model.Common.csproj">
       <Project>{254c9b59-4571-4ac6-b520-5048eb66dcf8}</Project>
       <Name>AnimalTest.Model.Common</Name>
