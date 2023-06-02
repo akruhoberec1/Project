@@ -16,7 +16,7 @@ namespace AnimalTest.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        public Employee GetEmployeeById(Guid id)
+        public async Task<Employee> GetEmployeeById(Guid id)
         {
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
 
