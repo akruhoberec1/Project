@@ -122,12 +122,22 @@ namespace AnimalTest.Repository
 
                 NpgsqlTransaction transaction = connection.BeginTransaction();
                 //person values
-                queryBuilderPerson.Append("FirstName = @firstName,");
-                cmd.Parameters.AddWithValue("@firstName", employee.FirstName);
-                queryBuilderPerson.Append(" LastName = @lastName,");
-                cmd.Parameters.AddWithValue("@lastName", employee.LastName);
-                queryBuilderPerson.Append(" OIB = @OIB,");
-                cmd.Parameters.AddWithValue("@OIB", employee.OIB);
+                if(employee.FirstName != null || employee.FirstName == "")
+                {
+                    queryBuilderPerson.Append("FirstName = @firstName,");
+                    cmd.Parameters.AddWithValue("@firstName", employee.FirstName);
+                }
+                if(employee.LastName != null || employee.LastName == "")
+                {
+                    queryBuilderPerson.Append(" LastName = @lastName,");
+                    cmd.Parameters.AddWithValue("@lastName", employee.LastName);
+                }
+                if(employee.OIB != null)
+                {
+                    queryBuilderPerson.Append(" OIB = @OIB,");
+                    cmd.Parameters.AddWithValue("@OIB", employee.OIB);
+                }
+                
 
                 string queryPerson = queryBuilderPerson.ToString().TrimEnd(commaToRemove);
                 StringBuilder finalPersonQuery = new StringBuilder();
