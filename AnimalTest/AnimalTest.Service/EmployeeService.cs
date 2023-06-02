@@ -38,10 +38,10 @@ namespace AnimalTest.Service
             
         }
 
-        public async Task<List<Employee>> GetAllEmployeesAsync()
+        public async Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
         {
             EmployeeRepository repository = new EmployeeRepository();
-            List<Employee> employees = await repository.GetAllEmployeesAsync();   
+            List<Employee> employees = await repository.GetAllEmployeesFilteredAsync(paging, sorting, filtering);   
             
             return employees;
         }

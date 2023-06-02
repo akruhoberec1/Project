@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AnimalTest.Common
 {
-    public class Class1
+    public class Filtering
     {
     }
 }

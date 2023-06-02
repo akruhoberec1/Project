@@ -12,7 +12,7 @@ namespace AnimalTest.Repository.Common
         Task<Employee> GetEmployeeByIdAsync(Guid id);
         Task<bool> CreateEmployeeAsync(Employee employee);
         Task<bool> UpdateEmployeeAsync(Guid id, Employee employee);
-        Task<List<Employee>> GetAllEmployeesAsync();
+        Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering);
         Task<bool> DeleteEmployeeAsync(Guid id);
 
     }

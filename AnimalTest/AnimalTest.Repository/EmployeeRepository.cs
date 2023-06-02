@@ -192,7 +192,7 @@ namespace AnimalTest.Repository
         /*
          * GET ALL METHOD HERE
          * */
-        public async Task<List<Employee>> GetAllEmployeesAsync()
+        public async Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
         {
             List<Employee> employees = new List<Employee>();
 

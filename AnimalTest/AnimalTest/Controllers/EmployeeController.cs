@@ -1,4 +1,5 @@
-﻿using AnimalTest.Models;
+﻿using AnimalTest.Common;
+using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service;
 using Npgsql;
@@ -24,10 +25,13 @@ namespace AnimalTest.Controllers
         
         [HttpGet]
         [Route("")]
-        public async Task<HttpResponseMessage> Get()
+        public async Task<HttpResponseMessage> Get(Paging paging, Sorting sorting, Filtering filtering)
         {
             EmployeeService service = new EmployeeService();
-            List<Employee> employees = await service.GetAllEmployeesAsync();
+
+
+
+            List<Employee> employees = await service.GetAllEmployeesFilteredAsync(paging, sorting, filtering);
             if (employees == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
