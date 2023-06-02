@@ -258,8 +258,6 @@ namespace AnimalTest.Repository
         }
 
 
-
-
  
         private static bool OibChecker(string oib)
         {

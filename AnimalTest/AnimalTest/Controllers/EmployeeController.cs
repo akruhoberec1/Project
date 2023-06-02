@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -32,9 +33,7 @@ namespace AnimalTest.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
             }
 
-            //List<EmployeeRest> mappedEmployees = MapEmployeeToRest(employees);
-
-            return Request.CreateResponse(HttpStatusCode.OK, employees);
+            return Request.CreateResponse(HttpStatusCode.OK, MapEmployeeToRest(employees));
 
         }
 
@@ -49,14 +48,13 @@ namespace AnimalTest.Controllers
             }
 
             Employee employee = await GetEmployeeByIdAsync(id);
-            EmployeeRest employeeToShow = MapEmployeeToRest(employee);
 
-            if (employeeToShow == null)
+            if ( employee == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "Did not find an employee.");
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, employeeToShow);
+            return Request.CreateResponse(HttpStatusCode.OK, MapOneEmployeeToRest(employee));
 
         }
 
@@ -123,26 +121,33 @@ namespace AnimalTest.Controllers
 
             EmployeeService employeeService = new EmployeeService();
             Employee employee = await employeeService.GetEmployeeByIdAsync(id);
-            //EmployeeRest mappedEmployee = MapEmployeeToRest(employee); // List<EmployeeRest> mappedEmployee = MapEmployeeToRest(new[] {employee});
+            
 
             return employee;
 
         }
 
-        private EmployeeRest MapEmployeeToRest(Employee employee)
+        private List<EmployeeRest> MapEmployeeToRest(List<Employee> employees)
         {
 
 
-            EmployeeRest employeeRest = new EmployeeRest()
-            {
-                FirstName = employee.FirstName,
-                LastName = employee.LastName,
-                OIB = employee.OIB,
-                Salary = employee.Salary,
-                Certified = employee.Certified
-            };
+            List<EmployeeRest> employeesRest = new List<EmployeeRest>();
 
-            return employeeRest;
+            if(employees != null)
+            {
+                foreach (Employee employee in employees)
+                {
+                    EmployeeRest employeeRest = new EmployeeRest();
+                    employeeRest.FirstName = employee.FirstName;
+                    employeeRest.LastName = employee.LastName;
+                    employeeRest.OIB = employee.OIB;
+                    employeeRest.Salary = employee.Salary;
+                    employeeRest.Certified = employee.Certified;
+                    employeesRest.Add(employeeRest);
+                };
+            }
+
+            return employeesRest;
         }
 
         private Employee MapEmployeeFromRest(EmployeeRest employeeRest)
@@ -159,16 +164,22 @@ namespace AnimalTest.Controllers
             return employee;
         }
 
-        //private List<EmployeeRest> MapEmployeeListToRest(List<Employee> employees)
-        //{
+        private EmployeeRest MapOneEmployeeToRest(Employee employee)
+        {
+
+            EmployeeRest employeeRest = new EmployeeRest()
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                OIB = employee.OIB,
+                Salary = employee.Salary,
+                Certified = employee.Certified
+            };
+
+            return employeeRest;
+        }
 
 
-        //    List<EmployeeRest> employeeRests = foreach (employees as e)
-        //    {
-
-        //    };
-
-        //}
 
 
 
