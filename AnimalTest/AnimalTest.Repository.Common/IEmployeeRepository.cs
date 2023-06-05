@@ -1,5 +1,6 @@
 ﻿using AnimalTest.Common;
 using AnimalTest.Models;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace AnimalTest.Repository.Common
         Task<Employee> GetEmployeeByIdAsync(Guid id);
         Task<bool> CreateEmployeeAsync(Employee employee);
         Task<bool> UpdateEmployeeAsync(Guid id, Employee employee);
-        Task<List<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering);
+        Task<PagedList<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering);
         Task<bool> DeleteEmployeeAsync(Guid id);
 
     }
