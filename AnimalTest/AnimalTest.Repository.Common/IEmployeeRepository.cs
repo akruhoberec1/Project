@@ -16,6 +16,5 @@ namespace AnimalTest.Repository.Common
         Task<bool> UpdateEmployeeAsync(Guid id, Employee employee);
         Task<PagedList<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering);
         Task<bool> DeleteEmployeeAsync(Guid id);
-
     }
 }

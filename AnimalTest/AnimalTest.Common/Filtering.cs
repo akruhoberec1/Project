@@ -13,3 +13,6 @@ namespace AnimalTest.Common
           public decimal? MaxSalary { get; set;  }
     }
 }
+
+// where searchQuery = Neshto and datetime bla bla and 
+// || || || || koliko god uspordebi želio i joinamo što želimo i izi pizi
