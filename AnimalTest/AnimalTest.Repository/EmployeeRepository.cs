@@ -200,83 +200,92 @@ namespace AnimalTest.Repository
             List<Employee> employees = new List<Employee>();
 
             NpgsqlConnection connection = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["connectionString"].ToString());
-            
 
-            using (connection)
+            try
             {
-                
-                connection.Open();
-
-                StringBuilder sqlQuery = new StringBuilder();
-
-                NpgsqlCommand cmd = new NpgsqlCommand("", connection);
-
-                sqlQuery.Append("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id");
-
-                if(filtering != null)
-                {
-                    sqlQuery.Append(" WHERE 1=1");
-                    if (!string.IsNullOrEmpty(filtering.SearchQuery))
-                    {
-                        sqlQuery.Append(" AND a.FirstName ILIKE @SearchQuery AND a.LastName ILIKE @SearchQuery AND b.salary between @minSalary and @maxSalary");
-                        cmd.Parameters.AddWithValue("@SearchQuery", "%" + filtering.SearchQuery + "%");
-                    }
-
-                    if (filtering.MaxSalary != null)
-                    {
-                        
-                        cmd.Parameters.AddWithValue("maxSalary", filtering.MaxSalary);
-                    }
-
-                    if (filtering.MinSalary != null)
-                    {
-                        cmd.Parameters.AddWithValue("minSalary", filtering.MinSalary);
-                    }
-                }          
-
-                sqlQuery.Append(" ORDER BY a.@SortBy @OrderBy");
-
-                if (!string.IsNullOrEmpty(sorting.SortBy))
+                using (connection)
                 {
 
-                    cmd.Parameters.AddWithValue("@SortBy", "a." + sorting.SortBy);
-                }
 
-                if (!string.IsNullOrEmpty(sorting.OrderBy))
-                {
-                    cmd.Parameters.AddWithValue("@OrderBy", sorting.OrderBy);
-                }
+                    connection.Open();
 
+                    StringBuilder sqlQuery = new StringBuilder();
 
-                sqlQuery.Append(" OFFSET @Offset LIMIT @Limit");
+                    NpgsqlCommand cmd = new NpgsqlCommand("", connection);
 
-                cmd.CommandText = sqlQuery.ToString();
-                cmd.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
-                cmd.Parameters.AddWithValue("@Limit", paging.PageSize);
+                    sqlQuery.Append("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id");
 
-
-                NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
+                    if (filtering != null)
                     {
-                        employees.Add(new Employee()
+                        sqlQuery.Append(" WHERE 1=1");
+                        if (!string.IsNullOrEmpty(filtering.SearchQuery))
                         {
-                            FirstName = reader["FirstName"].ToString(),
-                            LastName = reader["LastName"].ToString(),
-                            OIB = reader["OIB"].ToString(),
-                            Salary = (decimal)reader["Salary"],
-                            Certified = (bool)reader["Certified"]
+                            sqlQuery.Append(" AND a.FirstName ILIKE @SearchQuery AND a.LastName ILIKE @SearchQuery");
+                            cmd.Parameters.AddWithValue("@SearchQuery", "%" + filtering.SearchQuery + "%");
+                        }
 
-                        });
+                        if (filtering.MinSalary != null)
+                        {
+
+                            sqlQuery.Append(" AND b.salary > @minSalary");
+                            cmd.Parameters.AddWithValue("@minSalary", filtering.MinSalary);
+
+                        }
+
+                        if (filtering.MinSalary != null)
+                        {
+                            sqlQuery.Append(" AND b.salary < @maxSalary");
+                            cmd.Parameters.AddWithValue("@maxSalary", filtering.MaxSalary);
+                        }
                     }
 
-                    //ne mogu poslati totalCount
-                    PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.PageNumber ?? 1, paging.PageSize);
-                    return pagedEmployees;
-                }            
-            return null;    
+
+
+                    if (!string.IsNullOrEmpty(sorting.SortBy))
+                    {
+                        sqlQuery.Append($" ORDER BY {sorting.SortBy} {sorting.OrderBy}");
+
+                    }
+
+
+                    sqlQuery.Append(" OFFSET @Offset LIMIT @Limit");
+
+                    cmd.CommandText = sqlQuery.ToString();
+                    cmd.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
+                    cmd.Parameters.AddWithValue("@Limit", paging.PageSize);
+
+
+                    NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            employees.Add(new Employee()
+                            {
+                                FirstName = reader["FirstName"].ToString(),
+                                LastName = reader["LastName"].ToString(),
+                                OIB = reader["OIB"].ToString(),
+                                Salary = (decimal)reader["Salary"],
+                                Certified = (bool)reader["Certified"]
+                            });
+                        }
+
+                        //ne mogu poslati totalCount
+                        PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.PageNumber ?? 1, paging.PageSize);
+                        return pagedEmployees;
+                    }
+
+                }
+                return null;
             }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
+            //return null;    
+            //}
         }
 
         //napraviti delete
@@ -372,11 +381,9 @@ namespace AnimalTest.Repository
 //cmdCount.CommandText = countQuery.ToString();
 
 //cmdCount.Parameters.AddWithValue("@SearchQuery", filtering.SearchQuery);
-//cmdCount.Parameters.AddWithValue("@SortBy", sorting.SortBy);
-//cmdCount.Parameters.AddWithValue("OrderBy", sorting.OrderBy);
+//cmdCount.Parameters.AddWithValue("@MinSalary", sorting.MinSalary);
+//cmdCount.Parameters.AddWithValue("MaxSalary", sorting.MaxSalary);
 
 ////dobijemo ukupan zbroj
 //int totalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
 
-
-//dodamo vrijednosti za perPage i koliko preskace
