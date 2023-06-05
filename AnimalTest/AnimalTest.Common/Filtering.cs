@@ -8,9 +8,9 @@ namespace AnimalTest.Common
 {
     public class Filtering
     {
-          public string SearchQuery { get; set; }    
-          public decimal? MinSalary { get; set;  }    
-          public decimal? MaxSalary { get; set;  }
+          public string SearchQuery { get; set; }
+          public decimal? MinSalary { get; set; } = 0;
+          public decimal? MaxSalary { get; set;  } = decimal.MaxValue;
     }
 }
 

@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using System.Collections.Specialized;
 using AnimalTest.Common;
 using PagedList;
+using System.Reflection;
 
 namespace AnimalTest.Repository
 {
@@ -208,49 +209,50 @@ namespace AnimalTest.Repository
 
                 StringBuilder sqlQuery = new StringBuilder();
 
-                NpgsqlCommand cmd = new NpgsqlCommand("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id", connection);
-                sqlQuery.Append(cmd);
+                NpgsqlCommand cmd = new NpgsqlCommand("", connection);
 
-                if (!string.IsNullOrEmpty(filtering.SearchQuery))
+                sqlQuery.Append("SELECT a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id");
+
+                if(filtering != null)
                 {
-                    sqlQuery.Append(" WHERE a.FirstName ILIKE %@SearchQuery% OR a.LastName ILIKE %@SearchQuery%");
-                }           
+                    sqlQuery.Append(" WHERE 1=1");
+                    if (!string.IsNullOrEmpty(filtering.SearchQuery))
+                    {
+                        sqlQuery.Append(" AND a.FirstName ILIKE @SearchQuery AND a.LastName ILIKE @SearchQuery AND b.salary between @minSalary and @maxSalary");
+                        cmd.Parameters.AddWithValue("@SearchQuery", "%" + filtering.SearchQuery + "%");
+                    }
+
+                    if (filtering.MaxSalary != null)
+                    {
+                        
+                        cmd.Parameters.AddWithValue("maxSalary", filtering.MaxSalary);
+                    }
+
+                    if (filtering.MinSalary != null)
+                    {
+                        cmd.Parameters.AddWithValue("minSalary", filtering.MinSalary);
+                    }
+                }          
+
+                sqlQuery.Append(" ORDER BY a.@SortBy @OrderBy");
 
                 if (!string.IsNullOrEmpty(sorting.SortBy))
                 {
-                    sqlQuery.Append(" ORDER BY @SortBy @OrderBy");
+
+                    cmd.Parameters.AddWithValue("@SortBy", "a." + sorting.SortBy);
                 }
 
-                NpgsqlCommand cmdCount = new NpgsqlCommand("SELECT COUNT(*) FROM (", connection);
-                StringBuilder countQuery = new StringBuilder();
-                countQuery.Append(cmdCount);
-                countQuery.Append(@sqlQuery);
-                countQuery.Append(") as TotalCount");
-
-
-                if (!string.IsNullOrEmpty(filtering.SearchQuery))
-                {
-                    cmd.Parameters.AddWithValue("@SearchQuery", filtering.SearchQuery);
-                }
-                if (!string.IsNullOrEmpty(sorting.SortBy))
-                {
-                    cmd.Parameters.AddWithValue("@SortBy", sorting.SortBy);
-                }
                 if (!string.IsNullOrEmpty(sorting.OrderBy))
                 {
-                    cmd.Parameters.AddWithValue("OrderBy", sorting.OrderBy);
+                    cmd.Parameters.AddWithValue("@OrderBy", sorting.OrderBy);
                 }
-                //dobijemo ukupan zbroj
-                //int totalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
 
 
-                //dodamo vrijednosti za perPage i PageNum
                 sqlQuery.Append(" OFFSET @Offset LIMIT @Limit");
 
-
-                NpgsqlCommand cmdFinal = new NpgsqlCommand(sqlQuery.ToString(), connection);    
-                cmdFinal.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
-                cmdFinal.Parameters.AddWithValue("@Limit", paging.PageSize);
+                cmd.CommandText = sqlQuery.ToString();
+                cmd.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
+                cmd.Parameters.AddWithValue("@Limit", paging.PageSize);
 
 
                 NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
@@ -358,3 +360,23 @@ namespace AnimalTest.Repository
 
 }
 
+
+
+
+
+//NpgsqlCommand cmdCount = new NpgsqlCommand("", connection);
+//StringBuilder countQuery = new StringBuilder();
+//countQuery.Append("SELECT COUNT(*) FROM (");
+//countQuery.Append(@sqlQuery);
+//countQuery.Append(") as TotalCount");
+//cmdCount.CommandText = countQuery.ToString();
+
+//cmdCount.Parameters.AddWithValue("@SearchQuery", filtering.SearchQuery);
+//cmdCount.Parameters.AddWithValue("@SortBy", sorting.SortBy);
+//cmdCount.Parameters.AddWithValue("OrderBy", sorting.OrderBy);
+
+////dobijemo ukupan zbroj
+//int totalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
+
+
+//dodamo vrijednosti za perPage i koliko preskace
