@@ -12,7 +12,6 @@ using System.Net;
 using System.Linq.Expressions;
 using System.Collections.Specialized;
 using AnimalTest.Common;
-using PagedList;
 using System.Reflection;
 
 namespace AnimalTest.Repository
@@ -220,7 +219,7 @@ namespace AnimalTest.Repository
                         sqlQuery.Append(" WHERE 1=1");
                         if (!string.IsNullOrEmpty(filtering.SearchQuery))
                         {
-                            sqlQuery.Append(" AND a.FirstName ILIKE @SearchQuery AND a.LastName ILIKE @SearchQuery");
+                            sqlQuery.Append(" AND a.FirstName ILIKE @SearchQuery OR a.LastName ILIKE @SearchQuery");
                             cmd.Parameters.AddWithValue("@SearchQuery", "%" + filtering.SearchQuery + "%");
                         }
 
@@ -232,14 +231,12 @@ namespace AnimalTest.Repository
 
                         }
 
-                        if (filtering.MinSalary != null)
+                        if (filtering.MaxSalary != null)
                         {
                             sqlQuery.Append(" AND b.salary < @maxSalary");
                             cmd.Parameters.AddWithValue("@maxSalary", filtering.MaxSalary);
                         }
                     }
-
-
 
                     if (!string.IsNullOrEmpty(sorting.SortBy))
                     {
@@ -247,11 +244,10 @@ namespace AnimalTest.Repository
 
                     }
 
-
                     sqlQuery.Append(" OFFSET @Offset LIMIT @Limit");
 
                     cmd.CommandText = sqlQuery.ToString();
-                    cmd.Parameters.AddWithValue("@Offset", paging.PageSize * (paging.PageNumber - 1));
+                    cmd.Parameters.AddWithValue("@Offset", paging.PageSize * ((paging.PageNumber ?? 1) - 1));
                     cmd.Parameters.AddWithValue("@Limit", paging.PageSize);
 
 
@@ -269,9 +265,43 @@ namespace AnimalTest.Repository
                                 Certified = (bool)reader["Certified"]
                             });
                         }
+                        
+                    }
 
-                        //ne mogu poslati totalCount
-                        PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.PageNumber ?? 1, paging.PageSize);
+                    reader.Close();
+
+                    NpgsqlCommand cmdCount = new NpgsqlCommand("", connection);
+                    StringBuilder countQuery = new StringBuilder();
+                    countQuery.Append("SELECT COUNT(*) FROM Employee as b INNER JOIN Person as a ON a.Id = b.Id");
+
+                    if (filtering != null)
+                    {
+                        countQuery.Append(" WHERE 1=1");
+                        if (!string.IsNullOrEmpty(filtering.SearchQuery))
+                        {
+                            countQuery.Append(" AND a.FirstName ILIKE @SearchQuery OR a.LastName ILIKE @SearchQuery");
+                            cmdCount.Parameters.AddWithValue("@SearchQuery", "%" + filtering.SearchQuery + "%");
+                        }
+
+                        if (filtering.MinSalary != null)
+                        {
+
+                            countQuery.Append(" AND b.salary > @minSalary");
+                            cmdCount.Parameters.AddWithValue("@minSalary", filtering.MinSalary);
+
+                        }
+
+                        if (filtering.MaxSalary != null)
+                        {
+                            countQuery.Append(" AND b.salary < @maxSalary");
+                            cmdCount.Parameters.AddWithValue("@maxSalary", filtering.MaxSalary);
+                        }
+
+                        cmdCount.CommandText = countQuery.ToString();
+
+                        paging.TotalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
+
+                        PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
                         return pagedEmployees;
                     }
 
@@ -283,9 +313,7 @@ namespace AnimalTest.Repository
 
                 throw;
             }
-            
-            //return null;    
-            //}
+
         }
 
         //napraviti delete
@@ -369,21 +397,4 @@ namespace AnimalTest.Repository
 
 }
 
-
-
-
-
-//NpgsqlCommand cmdCount = new NpgsqlCommand("", connection);
-//StringBuilder countQuery = new StringBuilder();
-//countQuery.Append("SELECT COUNT(*) FROM (");
-//countQuery.Append(@sqlQuery);
-//countQuery.Append(") as TotalCount");
-//cmdCount.CommandText = countQuery.ToString();
-
-//cmdCount.Parameters.AddWithValue("@SearchQuery", filtering.SearchQuery);
-//cmdCount.Parameters.AddWithValue("@MinSalary", sorting.MinSalary);
-//cmdCount.Parameters.AddWithValue("MaxSalary", sorting.MaxSalary);
-
-////dobijemo ukupan zbroj
-//int totalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
 

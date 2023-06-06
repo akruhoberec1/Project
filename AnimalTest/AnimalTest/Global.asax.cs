@@ -18,6 +18,7 @@ namespace AnimalTest
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //AutofacConfig.RegisterBundles(BundleTable.Bundles); 
         }
     }
 }

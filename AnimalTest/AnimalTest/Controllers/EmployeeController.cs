@@ -3,7 +3,6 @@ using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service;
 using Npgsql;
-using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -143,7 +142,6 @@ namespace AnimalTest.Controllers
 
             EmployeeService employeeService = new EmployeeService();
             Employee employee = await employeeService.GetEmployeeByIdAsync(id);
-            
 
             return employee;
 
@@ -163,7 +161,8 @@ namespace AnimalTest.Controllers
                         Salary = employee.Salary,
                         Certified = employee.Certified
                     }).ToList(),
-                    employees.PageNumber,
+                    employees.CurrentPage,
+                    employees.TotalCount,
                     employees.PageSize
                 );
 

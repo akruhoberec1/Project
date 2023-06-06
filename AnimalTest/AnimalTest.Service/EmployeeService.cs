@@ -2,7 +2,6 @@
 using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service.Common;
-using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
