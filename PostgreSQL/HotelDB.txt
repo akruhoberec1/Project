@@ -1,4 +1,5 @@
 create database hoteldb;
+drop database hoteldb;
 
 create table Person(
 Id uuid primary key,
@@ -79,9 +80,34 @@ insert into Person (Id, FirstName, LastName, OIB) values
 ('34f15f32-2c74-473d-b6aa-4888f56b4309','Paško','Patak',15862345873),
 ('75dbc13b-b988-4a1d-a097-3c26b139ab9c','Patak','Tvrdica',12365874951);
 
+insert into Job(Id, Title) values 
+('a7826436-cc5c-4f5c-bd6d-be8ba56659d4','Receptionist'),
+('0b8c15d9-678e-4b02-b1ef-35e04c874022','Bartender'),
+('6831d7d8-2741-4e2a-b3bc-a2081e1fa22e','Cleaner');
+
+
+insert into Employee (Id,Salary,Certified,JobId) values 
+('05227288-c656-4ff3-8a68-143b08df8464',580.60,true,'a7826436-cc5c-4f5c-bd6d-be8ba56659d4'),
+('a55c7326-a3a0-4cb4-ad56-c1e3f5576ece',610.20,false,'a7826436-cc5c-4f5c-bd6d-be8ba56659d4'),
+('9f5b678c-f859-49f7-8dae-886ebe4a49a2',700.30,true,'0b8c15d9-678e-4b02-b1ef-35e04c874022'),
+('8a5950c8-39e6-4ca7-9ff1-c96de597574e',560.60,true,'a7826436-cc5c-4f5c-bd6d-be8ba56659d4'),
+('33730d5f-9b9a-42cd-ba26-ecdc037d5b6e',590.90,false,'0b8c15d9-678e-4b02-b1ef-35e04c874022'),
+('75dbc13b-b988-4a1d-a097-3c26b139ab9c',690.20,true,'0b8c15d9-678e-4b02-b1ef-35e04c874022'),
+('34f15f32-2c74-473d-b6aa-4888f56b4309',680.30,false,'6831d7d8-2741-4e2a-b3bc-a2081e1fa22e'),
+('175edba3-f2ca-4d8e-924c-af795d0e26c1',632.65,false,'6831d7d8-2741-4e2a-b3bc-a2081e1fa22e');
 
 select * from person;
 select * from employee e;
+select * from job;
+
+select a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified from Employee as b inner join Person as a on a.Id = b.Id where a.FirstName ilike '%bran%' or a.LastName ilike '%kruh%'; 
+
+select a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified from Employee as b inner join Person as a on a.Id = b.Id where a.FirstName ilike '%bran%' or a.LastName ilike '%kruh%'
+order by Salary asc; 
+
+select a.FirstName, a.LastName, a.OIB, b.Salary, b.Certified from Employee as b inner join Person as a on a.Id = b.Id where a.FirstName ilike '%%' or a.LastName ilike '%%'
+order by Salary asc offset 5 rows fetch next 6 rows only;
+
 
 drop table roomtype ;
 drop table room;

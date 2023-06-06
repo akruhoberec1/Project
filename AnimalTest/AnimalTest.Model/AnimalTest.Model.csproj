@@ -52,5 +52,14 @@
     <Compile Include="Room.cs" />
     <Compile Include="RoomType.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AnimalTest.Common\AnimalTest.Common.csproj">
+      <Project>{f61f0448-e6d8-42b8-abf7-850be9eb46dd}</Project>
+      <Name>AnimalTest.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

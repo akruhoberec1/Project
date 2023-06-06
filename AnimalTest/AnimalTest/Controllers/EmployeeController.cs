@@ -1,4 +1,5 @@
-﻿using AnimalTest.Models;
+﻿using AnimalTest.Common;
+using AnimalTest.Models;
 using AnimalTest.Repository;
 using AnimalTest.Service;
 using Npgsql;
@@ -8,7 +9,9 @@ using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
+using AnimalTest.Service.Common;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -19,22 +22,45 @@ namespace AnimalTest.Controllers
     [RoutePrefix("api/employee")]
     public class EmployeeController : ApiController
     {
+        private readonly IEmployeeService _employeeService;
+        
+        public EmployeeController(IEmployeeService employeeService)
+        {
+            _employeeService = employeeService; 
+        }
 
         
         [HttpGet]
         [Route("")]
-        public async Task<HttpResponseMessage> Get()
+        public async Task<HttpResponseMessage> Get(int pageSize, string sortBy, string sortOrder, string searchQuery, int? pageNumber, decimal? minSalary, decimal? maxSalary)
         {
-            EmployeeService service = new EmployeeService();
-            List<Employee> employees = await service.GetAllEmployeesAsync();
+
+            Paging paging = new Paging()
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
+
+            Sorting sorting = new Sorting()
+            {
+                SortBy = sortBy,
+                OrderBy = sortOrder
+            };
+
+            Filtering filtering = new Filtering()
+            {
+               SearchQuery = searchQuery,
+               MinSalary = minSalary,
+               MaxSalary = maxSalary
+            };
+
+            PagedList<Employee> employees = await _employeeService.GetAllEmployeesFilteredAsync(paging, sorting, filtering);
             if (employees == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "We couldn't find any employees.");
             }
 
-            //List<EmployeeRest> mappedEmployees = MapEmployeeListToRest(employees);
-
-            return Request.CreateResponse(HttpStatusCode.OK, employees);
+            return Request.CreateResponse(HttpStatusCode.OK, MapEmployeeToRest(employees));
 
         }
 
@@ -43,17 +69,19 @@ namespace AnimalTest.Controllers
         [Route("{id}")]
         public async Task<HttpResponseMessage> Get(Guid id)
         {
-            EmployeeService service = new EmployeeService();    
-            Employee employee = await service.GetEmployeeByIdAsync(id);
+            if (id == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Please insert valid ID.");
+            }
 
-            EmployeeRest employeeToShow = MapEmployeeToRest(employee);
+            Employee employee = await GetEmployeeByIdAsync(id);
 
-            if (employeeToShow == null)
+            if ( employee == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, "Did not find an employee.");
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, employeeToShow);
+            return Request.CreateResponse(HttpStatusCode.OK, MapOneEmployeeToRest(employee));
 
         }
 
@@ -63,8 +91,7 @@ namespace AnimalTest.Controllers
         public async Task<HttpResponseMessage> Post([FromBody]EmployeeRest employeeRest)
         {
             Employee employee = MapEmployeeFromRest(employeeRest);
-            EmployeeService employeeService = new EmployeeService();
-            bool isCreated = await employeeService.CreateEmployeeAsync(employee);
+            bool isCreated = await _employeeService.CreateEmployeeAsync(employee);
 
             if (isCreated == false)
             {
@@ -87,8 +114,7 @@ namespace AnimalTest.Controllers
             }
 
             Employee employee = MapEmployeeFromRest(employeeRest);
-            EmployeeService employeeService = new EmployeeService();
-            bool isUpdated = await employeeService.UpdateEmployeeAsync(id, employee);
+            bool isUpdated = await _employeeService.UpdateEmployeeAsync(id, employee);
 
             if(isUpdated == false)
             {
@@ -102,8 +128,7 @@ namespace AnimalTest.Controllers
         [Route("{id}")]
         public async Task<HttpResponseMessage> Delete(Guid id)
         {
-            EmployeeService service = new EmployeeService();
-            bool isDeleted = await service.DeleteEmployeeAsync(id);    
+            bool isDeleted = await _employeeService.DeleteEmployeeAsync(id);    
 
             if( isDeleted == false)
             {
@@ -115,30 +140,38 @@ namespace AnimalTest.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        private async Task<EmployeeRest> GetEmployeeByIdAsyncd(Guid id)
+        private async Task<Employee> GetEmployeeByIdAsync(Guid id)
         {
-            EmployeeService employeeService = new EmployeeService();
-            Employee employee = await employeeService.GetEmployeeByIdAsync(id);
-            EmployeeRest mappedEmployee = MapEmployeeToRest(employee); // List<EmployeeRest> mappedEmployee = MapEmployeeListToRest(new[] {employee});
 
-            return mappedEmployee;
+            Employee employee = await _employeeService.GetEmployeeByIdAsync(id);
+
+            return employee;
 
         }
 
-        private EmployeeRest MapEmployeeToRest(Employee employee)
+        private PagedList<EmployeeRest> MapEmployeeToRest(PagedList<Employee> employees)
         {
 
-
-            EmployeeRest employeeRest = new EmployeeRest()
+            if(employees != null)
             {
-                FirstName = employee.FirstName,
-                LastName = employee.LastName,
-                OIB = employee.OIB,
-                Salary = employee.Salary,
-                Certified = employee.Certified
-            };
+                PagedList<EmployeeRest> employeesRest = new PagedList<EmployeeRest>(
+                    employees.Select(employee => new EmployeeRest
+                    {
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        OIB = employee.OIB,
+                        Salary = employee.Salary,
+                        Certified = employee.Certified
+                    }).ToList(),
+                    employees.CurrentPage,
+                    employees.TotalCount,
+                    employees.PageSize
+                );
 
-            return employeeRest;
+                return employeesRest;
+            }
+
+            return null;
         }
 
         private Employee MapEmployeeFromRest(EmployeeRest employeeRest)
@@ -155,16 +188,22 @@ namespace AnimalTest.Controllers
             return employee;
         }
 
-        //private List<EmployeeRest> MapEmployeeListToRest(List<Employee> employees)
-        //{
+        private EmployeeRest MapOneEmployeeToRest(Employee employee)
+        {
+
+            EmployeeRest employeeRest = new EmployeeRest()
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                OIB = employee.OIB,
+                Salary = employee.Salary,
+                Certified = employee.Certified
+            };
+
+            return employeeRest;
+        }
 
 
-        //    List<EmployeeRest> employeeRests = foreach (employees as e)
-        //    {
-
-        //    };
-
-        //}
 
 
 
