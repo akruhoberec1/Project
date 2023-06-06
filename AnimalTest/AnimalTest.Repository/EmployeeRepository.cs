@@ -304,8 +304,8 @@ namespace AnimalTest.Repository
                         PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
                         return pagedEmployees;
                     }
-
                 }
+
                 return null;
             }
             catch (Exception ex)
@@ -389,7 +389,6 @@ namespace AnimalTest.Repository
             }
             return true;
         }
-
 
 
 
