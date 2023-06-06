@@ -1,6 +1,7 @@
 ﻿using AnimalTest.Common;
 using AnimalTest.Models;
 using AnimalTest.Repository;
+using AnimalTest.Repository.Common;
 using AnimalTest.Service.Common;
 using System;
 using System.Collections.Generic;
@@ -12,28 +13,30 @@ namespace AnimalTest.Service
 {
     public class EmployeeService : IEmployeeService
     {
-        public async Task<Employee> GetEmployeeByIdAsync(Guid id)
+        private readonly IEmployeeRepository _employeeRepository;   
+        public EmployeeService(IEmployeeRepository employeeRepository) 
         {
-            EmployeeRepository repository = new EmployeeRepository();   
-            Employee employee = await  repository.GetEmployeeByIdAsync(id); 
+            _employeeRepository = employeeRepository;
+        }
+        public async Task<Employee> GetEmployeeByIdAsync(Guid id)
+        {  
+            Employee employee = await  _employeeRepository.GetEmployeeByIdAsync(id); 
 
             return employee;
       
         }
 
         public async Task<bool> CreateEmployeeAsync(Employee employee)
-        {
-            EmployeeRepository repository = new EmployeeRepository();   
+        {  
             
-            bool isCreated = await repository.CreateEmployeeAsync(employee);  
+            bool isCreated = await _employeeRepository.CreateEmployeeAsync(employee);  
 
             return isCreated;
         }
 
         public async Task<bool> UpdateEmployeeAsync(Guid id, Employee employee) 
         {
-            EmployeeRepository repository = new EmployeeRepository();
-            bool isUpdated = await repository.UpdateEmployeeAsync(id, employee);  
+            bool isUpdated = await _employeeRepository.UpdateEmployeeAsync(id, employee);  
 
             return isUpdated;
             
@@ -41,16 +44,14 @@ namespace AnimalTest.Service
 
         public async Task<PagedList<Employee>> GetAllEmployeesFilteredAsync(Paging paging, Sorting sorting, Filtering filtering)
         {
-            EmployeeRepository repository = new EmployeeRepository();
-            PagedList<Employee> employees = await repository.GetAllEmployeesFilteredAsync(paging, sorting, filtering);   
+            PagedList<Employee> employees = await _employeeRepository.GetAllEmployeesFilteredAsync(paging, sorting, filtering);   
             
             return employees;
         }
 
         public async Task<bool> DeleteEmployeeAsync(Guid id) 
         {
-            EmployeeRepository repository = new EmployeeRepository();
-            bool isDeleted = await repository.DeleteEmployeeAsync(id); 
+            bool isDeleted = await _employeeRepository.DeleteEmployeeAsync(id); 
             return isDeleted;
         }
 
