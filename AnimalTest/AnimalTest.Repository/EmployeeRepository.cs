@@ -301,7 +301,7 @@ namespace AnimalTest.Repository
 
                         paging.TotalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
 
-                        PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
+                        PagedList<Employee> pagedEmployees = new PagedList<Employee>(employees, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize ?? 3);
                         return pagedEmployees;
                     }
                 }

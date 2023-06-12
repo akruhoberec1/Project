@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.WebPages;
+using System.Drawing.Printing;
 
 namespace AnimalTest.Controllers
 {
@@ -29,10 +30,10 @@ namespace AnimalTest.Controllers
             _employeeService = employeeService; 
         }
 
-        
+
         [HttpGet]
         [Route("")]
-        public async Task<HttpResponseMessage> Get(int pageSize, string sortBy, string sortOrder, string searchQuery, int? pageNumber, decimal? minSalary, decimal? maxSalary)
+        public async Task<HttpResponseMessage> Get(int? pageNumber = 1, int? pageSize = 10, decimal? minSalary = null, decimal? maxSalary = null, string sortBy = "a.FirstName", string sortOrder = "asc", string searchQuery = "")
         {
 
             Paging paging = new Paging()
@@ -138,8 +139,6 @@ namespace AnimalTest.Controllers
         }
 
 
-        [HttpGet]
-        [Route("{id}")]
         private async Task<Employee> GetEmployeeByIdAsync(Guid id)
         {
 
