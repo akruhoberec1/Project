@@ -176,14 +176,14 @@ namespace AnimalTest.Repository
                     cmdEmployee.CommandText = finalEmployeeQuery.ToString();
                     await cmdEmployee.ExecuteNonQueryAsync();
 
-                    int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();
-
-                    transaction.Commit();
+                    int affectedRowsEmployee = await cmdEmployee.ExecuteNonQueryAsync();     
 
                     if (affectedRowsPerson > 0 && affectedRowsEmployee > 0)
                     {
+                        transaction.Commit();
                         return true;
                     }
+                    transaction.Rollback();
                     return false;
                 }
             }
@@ -388,12 +388,8 @@ namespace AnimalTest.Repository
                 return false;
             }
             return true;
-        }
-
-
-
+         }
     }
-
 }
 
 
